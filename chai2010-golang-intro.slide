@@ -1,0 +1,534 @@
+# Copyright 2013 <chaishushan{AT}gmail.com>. All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# -----------------------------------------------------------------------------
+
+Go语言简介
+
+chai2010
+chaishushan@gmail.com
+https://github.com/chai2010
+
+# -----------------------------------------------------------------------------
+
+* 自我介绍(chai2010)
+
+Go语言代码贡献者:
+
+- 图像库功能的完善([[https://code.google.com/p/go/source/list?repo=image][bmp/tiff]]等)
+- [[https://code.google.com/p/go/source/browse/misc/notepadplus/README][notepad++]]等功能的完善和实现([[https://code.google.com/p/go/source/browse/misc/notepadplus/userDefineLang.xml][语法高亮]]/[[https://code.google.com/p/go/source/browse/misc/notepadplus/go.xml][内建函数自动补全]]/[[https://code.google.com/p/go/source/browse/misc/notepadplus/functionList.xml][函数列表]]等)
+- BUG修复([[http://golang.org/pkg/net/rpc/][rpc]]/[[http://talks.golang.org/][talks]]/[[http://tour.golang.org/][gotour]]等)
+
+[[http://zh.golanger.com][Go语言中文文档]]翻译者
+
+[[https://groups.google.com/forum/#!forum/golang-china][golang-china]] 邮件列表初始创建者和维护者
+
+QQ群: 102319854
+
+.image chai2010-golang-intro/images/frontpage.png
+
+* 开源项目(chai2010)
+
+- [[https://github.com/chai2010/gettext-go/][gettext-go]] - 纯Go实现的gettext库
+- [[https://github.com/chai2010/protorpc/][protorpc]] - 基于Protobuf/Snappy的RPC实现(Go/C++)
+- [[https://code.google.com/p/go-leveldb/][go-leveldb]] - 基于leveldb深度定制的cgo封装
+- [[https://github.com/chai2010/go-opencv/][go-opencv]] - OpenCV的Go语言封装( *还未完成* )
+- [[https://code.google.com/p/go-gdal/][go-gdal]] - GDAL库的Go语言封装
+- [[https://code.google.com/p/go-liblas/][go-liblas]] - LibLAS库的Go语言封装
+- [[https://github.com/chai2010/pwdgen/][pwdgen]] - 密码生成小工具
+
+# -----------------------------------------------------------------------------
+* 初识Go语言
+# -----------------------------------------------------------------------------
+
+* 你好, 世界!
+
+.play -edit chai2010-golang-intro/helloworld.go /package main/,
+
+- 支持中文?
+- 没有分号?
+
+.image chai2010-golang-intro/images/talks.png 200 264
+
+* 谁开发了Go?
+
+[[http://en.wikipedia.org/wiki/Robert_Griesemer][Robert Griesemer]], [[http://en.wikipedia.org/wiki/Ken_Thompson][Ken Thompson]], 和 [[http://en.wikipedia.org/wiki/Rob_Pike][Rob Pike]],
+2007年底开始.
+
+到2008年中期, 大部分设计完成, 已经开始实现(编译器和运行时).
+
+[[http://research.google.com/pubs/author37504.html][Ian Taylor]] 和 [[http://swtch.com/~rsc/][Russ Cox]] 在 2008年 加入.
+
+还有很多...
+
+* Go语言之父
+
+.image chai2010-golang-intro/images/go_father.png 550 1000
+
+* 为什么?
+
+更快!
+
+找回编程的乐趣!
+
+By [[http://en.wikipedia.org/wiki/Rob_Pike][Rob Pike]]
+
+
+* 这世界变化快...
+
+最近十年内没有诞生新的系统级语言!
+
+但是世界已经改变了太多:
+
+- 庞大的库和依赖关系链
+- 网络应用已经成为主导
+- 大规模的程序开发
+- 多核CPU的崛起
+
+目前的系统语言设计时并没有考虑这些因素.
+
+* Go语言的设计目标
+
+- 要有静态类型语言的运行效率
+- 还要动态语言那样的轻松编程
+- 绝对安全: 类型安全和内存安全
+- 完美的支持并发和通信
+- 高效的无延迟的垃圾收集
+- 快速的编译
+
+参考文章:
+
+- [[http://mikespook.com/2012/06/%E7%BF%BB%E8%AF%91%E5%B0%91%E6%98%AF%E6%8C%87%E6%95%B0%E7%BA%A7%E7%9A%84%E5%A4%9A/][少是指数级的多(Less is exponentially more) - Rob Pike]]
+- [[http://www.oschina.net/translate/go-at-google-language-design-in-the-service-of-software-engineering][Go在谷歌: 以软件工程为目的的语言设计]]
+
+
+# -----------------------------------------------------------------------------
+* 语言简介
+# -----------------------------------------------------------------------------
+
+* 基础
+
+.code chai2010-golang-intro/code_basic.go /^const/,
+
+* 程序结构(Echo)
+
+.code chai2010-golang-intro/code_simple.go /^package main/,
+
+* 常量
+
+.code chai2010-golang-intro/code_consts.go /^type/,
+
+* 变量和类型
+
+.code chai2010-golang-intro/code_var_and_type.go /^weekend/,
+
+* 方法
+
+.code chai2010-golang-intro/code_method.go /^type/,
+
+* 自定义类型的方法
+
+.play -edit chai2010-golang-intro/code_method_user_type.go /^package/,
+
+* 接口
+
+.code chai2010-golang-intro/code_interface.go /^type/,
+
+* 接口的特点
+
+先定义一个写接口:
+
+	type Writer interface {
+		Write(p []byte) (n int, err os.Error)
+	}
+
+对应任意包含了 `Write` 方法的类型( *隐式接口* ), 比如:
+文件, 管道, 网络, 缓存...
+
+`fmt.Fprintf` 就是将格式化的数据写到接口.
+
+类似地, `bufio.NewWriter` 输入 `io.Writer` ,
+返回一个带缓存的 `io.Writer` .
+
+* 接口的例子
+
+.play chai2010-golang-intro/code_interface_example.go
+
+* 管道(chan)
+
+.code chai2010-golang-intro/code_chan.go /^var/,
+
+管道(chan)是一个带类型/线程安全/阻塞的消息队列(也可以设置缓存).
+
+*管道(chan)不仅用于通信*, *还用于同步*!
+
+* Goroutine(Go程)
+
+.code chai2010-golang-intro/code_goroutine.go /^x/,
+
+* 素数筛(01)
+
+.image chai2010-golang-intro/images/prime-sieve.png 500 1000
+
+* 素数筛(02)
+
+返回生成自然数序列的管道: 2, 3, 4, ...
+
+.code -edit chai2010-golang-intro/code_prime_sieve.go /^func GenerateNatural/,/^}/
+
+管道过滤器: 删除能被素数整除的数
+
+.code -edit chai2010-golang-intro/code_prime_sieve.go /^func PrimeFilter/,/^}/
+
+* 素数筛(03)
+
+素数筛: 菊花链模型
+
+.play -edit chai2010-golang-intro/code_prime_sieve.go /^func main/,/^}/
+
+* 更多特性...
+
+- 包
+- 初始化
+- 反射
+- 动态类型
+- 嵌入
+- 迭代器
+- 单元测试
+- ...
+
+# -----------------------------------------------------------------------------
+* 语言演化历程
+# -----------------------------------------------------------------------------
+
+* 语言演化族谱
+
+.image chai2010-golang-intro/images/go-history.png
+
+- [[http://en.wikipedia.org/wiki/B_(programming_language)][B]] - Ken Thompson, 1969
+- [[http://en.wikipedia.org/wiki/C_(programming_language)][C]] - Dennis Ritchie, 1972
+- [[http://en.wikipedia.org/wiki/Newsqueak][Newsqueak]] - Rob Pike, 1989, GUI
+- [[http://en.wikipedia.org/wiki/Alef_(programming_language)][Alef]] - Phil Winterbottom, 1993, *C-like*
+- [[http://en.wikipedia.org/wiki/Limbo_(programming_language)][Limbo]] - Sean Dorward, Phil Winterbottom, Rob Pike,1995
+- [[http://golang.org/][Go]] - 2009, *C-like*
+
+* 语言演化族谱
+
+- [[http://coolshell.cn/articles/1351.html][管道]] - Malcolm Douglas McIlroy, 1964
+- [[http://en.wikipedia.org/wiki/Communicating_sequential_processes][CSP]] - C. A. R. Hoare, 1978
+- [[http://en.wikipedia.org/wiki/Occam_(programming_language)][occam]] - INMOS, 1983
+- [[http://en.wikipedia.org/wiki/Erlang_(programming_language)][Erlang]] - Ericsson, 1986
+
+* Go语言特性来源
+
+- 基础语法, 简约哲学: C语言
+- 并发模型: [[http://en.wikipedia.org/wiki/Communicating_sequential_processes][CSP]], [[http://en.wikipedia.org/wiki/Newsqueak][Newsqueak]], [[http://en.wikipedia.org/wiki/Alef_(programming_language)][Alef]]
+- 模块系统: [[http://en.wikipedia.org/wiki/Limbo_(programming_language)][Limbo]]
+- 面向对象: [[http://en.wikipedia.org/wiki/Robert_Griesemer][Robert Griesemer]]
+- ...
+
+* B语言 - Ken Thompson, 1972
+
+.code chai2010-golang-intro/helloworld.b
+
+* C语言 - Dennis Ritchie, 1974
+
+.code chai2010-golang-intro/helloworld.c
+
+.image chai2010-golang-intro/images/Ken_n_dennis.png 300 1000
+
+* Newsqueak素数筛(01) - Rob Pike, 1989
+
+.code chai2010-golang-intro/squint.newsqueak /^counter/,/^}/
+
+.code chai2010-golang-intro/squint.newsqueak /^filter/,/^}/
+
+.image chai2010-golang-intro/images/spaceglenda37.png 250 1000
+
+* Newsqueak素数筛(02) - Rob Pike, 1989
+
+.code chai2010-golang-intro/squint.newsqueak /sieve OMIT/,
+
+* Alef(01) - Phil Winterbottom, 1993
+
+.code chai2010-golang-intro/helloworld.alef
+
+* Alef(02) - Phil Winterbottom, 1993
+
+.image chai2010-golang-intro/images/alef.png
+
+* Limbo - Sean Dorward, Phil Winterbottom, Rob Pike, 1995
+
+.code chai2010-golang-intro/helloworld.limbo
+
+* Go语言诞生(hg log -r 0:4)
+
+.image chai2010-golang-intro/images/go-log04.png 500 950
+
+* Go Spec - 2008.03.02
+
+- 没有 '->', 用 '.' 代替
+- 元组赋值: (a, b) = (b, a);
+- struct可以添加方法
+- 数组是值
+- 没有指针运算
+- 是否需要类型switch?
+- 后缀(无前缀) ++ 和 -- 是语句, 不是表达式
+- 语言级的并发支持
+- 垃圾回收
+- 短小精悍, 少即是多(为什么?)
+- ...
+
+# -----------------------------------------------------------------------------
+* Go语言在中国
+# -----------------------------------------------------------------------------
+
+* 使用Go语言的公司
+
+.image chai2010-golang-intro/images/go-in-china.png 480 1000
+
+[[http://www.ecug.org/2013:golang-in-china][http://www.ecug.org/2013:golang-in-china]]
+
+* 国内社区
+
+- [[https://groups.google.com/forum/#!forum/golang-china][golang-china]], 人数1500+, 主题1000+
+- [[https://codereview.appspot.com/search?closed=1&owner=vcc.163%40gmail.com&reviewer=&cc=&repo_guid=&base=&private=1&created_before=&created_after=&modified_before=&modified_after=&order=&format=html&keys_only=False&with_messages=False&cursor=&limit=30][韦广京(vcc.163)]], 完成Windows移植
+- [[https://codereview.appspot.com/search?closed=1&owner=minux.ma%40gmail.com&reviewer=&cc=&repo_guid=&base=&private=1&created_before=&created_after=&modified_before=&modified_after=&order=&format=html&keys_only=False&with_messages=False&cursor=&limit=30][minux.ma]], 完成众多核心功能, 核心成员
+- [[http://www.google.com/trends/explore?hl=zh-CN#q=golang&date=10/2009+50m&cmpt=q][google趋势]], 中国热度全球第一
+
+* Go语言粉丝分布
+
+.image chai2010-golang-intro/images/go-trends.png 500 1000
+
+[[http://www.google.com/trends/explore?hl=zh-CN#q=golang&date=10/2009+50m&cmpt=q][Golang趋势]]
+
+* golang-china
+
+.image chai2010-golang-intro/images/golang-china.png 500 1000
+
+[[https://groups.google.com/forum/#!forum/golang-china][golang-china]]
+
+* 中文文档
+
+.image chai2010-golang-intro/images/godoc-zh.png 500 1000
+
+[[http://zh.golanger.com/doc/articles/defer_panic_recover.html][http://zh.golanger.com/doc/articles/defer_panic_recover.html]]
+
+* Go指南(gotour)
+
+.image chai2010-golang-intro/images/gotour-zh.png 500 1000
+
+[[http://go-tour-zh.appspot.com/][http://go-tour-zh.appspot.com/]]
+
+* 国内的开源项目
+
+- [[https://code.google.com/p/liteide/][liteide]] - 跨平台的Go语言IDE, Qt开发, by visualfc
+- [[https://github.com/astaxie/beego][beego]] - web开发框架, by astaxie
+- [[https://code.google.com/p/weed-fs/][weed-fs]] - 分布式文件系统, by chris.lu
+- [[https://github.com/coocood/qbs][Qbs]]: 数据库ORM, by coocood
+- [[https://github.com/lunny/xorm][xorm]]: 数据库ORM, lunny
+- [[https://github.com/AllenDang/gform][gform]]: Windows GUI, by AllenDang
+- [[https://github.com/mikespook/gearman-go][gearman-go]]: Gearman API for Golang, by mikespook
+- [[https://github.com/xtaci/gonet][gonet]]: 游戏, by xtaci
+- [[http://uniqush.org/][uniqush]]: 手机推送服务, by Monnand
+- [[https://github.com/chai2010/protorpc/][protorpc]] - 基于Protobuf/Snappy的RPC实现, by chai2010
+- ...
+
+* 国内贡献者(R17838)(01)
+
+- [[mailto:chaishushan@gmail.com][chaishushan@gmail.com]] 17
+- [[mailto:coocood@gmail.com][coocood@gmail.com]] 2
+- [[mailto:diogin@gmail.com][diogin@gmail.com]] 3
+- [[mailto:fan.howard@gmail.com][fan.howard@gmail.com]] 1
+- [[mailto:hongruiqi@gmail.com][hongruiqi@gmail.com]] 4
+- [[mailto:i3dmaster@gmail.com][i3dmaster@gmail.com]] 3
+- [[mailto:mikespook@gmail.com][mikespook@gmail.com]] 0, gotour-zh
+- [[mailto:minux.ma@gmail.com][minux.ma@gmail.com]] 463, Committer
+- [[mailto:monnand@gmail.com][monnand@gmail.com]] 1
+- [[mailto:olingcat@gmail.com][olingcat@gmail.com]] 25, doc
+
+* 国内贡献者(R17838)(02)
+
+- [[mailto:qyzhai@gmail.com][qyzhai@gmail.com]] 10
+- [[mailto:vcc.163@gmail.com][vcc.163@gmail.com]] 41, windows port
+- ?
+
+* Go语言图书
+
+- <[[http://ac-me.googlecode.com/files/ogle-1318397453531000.pdf][Go胡文]]>: (八卦, 电子书), fango 著
+- <[[http://mikespook.com/learning-go/][Learning Go]]>中文版(电子书) - mikespook 翻译
+- <[[http://www.ituring.com.cn/book/1040][Go语言·云动力]]>. 国内第一本Go专著, fango 著
+- <[[http://www.ituring.com.cn/book/967][Go语言编程]]>, 许式伟 著
+- <[[http://product.china-pub.com/3767290][Go Web 编程]]>, astaxie 著, 有开源版
+- <[[http://www.ptpress.com.cn/Book.aspx?id=35714][Programming In Go]]>中文版, 第一本外文, 许式伟 翻译
+- <[[http://www.ituring.com.cn/book/1205][The Way To Go]]>中文版(电子书), 无闻 翻译中
+- <Go学习笔记>, 雨痕
+- ?
+
+# -----------------------------------------------------------------------------
+* Go语言发展现状
+# -----------------------------------------------------------------------------
+
+* 流行趋势(四年)
+
+.image chai2010-golang-intro/images/x4years-graph.png 500 1000
+
+[[http://www.google.com/trends/explore?hl=zh-CN#q=golang&date=10/2009+50m&cmpt=q][google趋势]]
+
+* 发布日志
+
+- 2009.12.09-2012.03.27: weekly
+- 2011.03.16-2011.09.07: r56-r60
+- 2012.03.28-2012.09.21: Go1.0(1.0.0~1.0.3), *第一个稳定版本*
+- 2013.05.13-2013.08.13: Go1.1(1.1.0~1.1.2), *性能提升*, *语言完善*
+- 2013.12.01: Go1.2
+
+Go 1.2更新:
+
+- 性能提升
+- *半抢占式调度*
+- 切片语法完善
+- *CGO支持C++*
+
+* 语言性能(Go 1.1): BenchmarksGame
+
+.image chai2010-golang-intro/images/benchmarksgame-go-vs-c.png 500 1000
+
+[[http://benchmarksgame.alioth.debian.org/][http://benchmarksgame.alioth.debian.org/]]
+
+* 语言性能(Go 1.1): by logicchains
+
+.image chai2010-golang-intro/images/benchmarking-level-generation-go-rust-haskell-and-d.png 400 600
+
+[[http://togototo.wordpress.com/2013/07/23/benchmarking-level-generation-go-rust-haskell-and-d/][Benchmarking level generation: Go, Rust, Haskell and D (and now Scala).]]
+
+* 语言性能: 官方数据
+
+Go语言和C语言性能差距在10%以内!
+
+.code -edit chai2010-golang-intro/timing.log /^# Sep 26, 2012/,/^#\s*regex/
+
+.code -edit chai2010-golang-intro/timing.log /^# May 23, 2013/,/^#\s*fannkuch/
+
+[[http://go.googlecode.com/hg/test/bench/shootout/timing.log][http://go.googlecode.com/hg/test/bench/shootout/timing.log]]
+
+* 标准库性能
+
+http:
+
+- golang helloworld 45% slower than node.js (start)
+- golang helloworld is 41% faster than node.js (end)
+
+bigint: 30~40% slower than gmp
+regex: 5X slower ?
+
+GC性能有待继续优化
+
+* 准标准库(官方维护)
+
+- [[https://code.google.com/p/snappy-go/][snappy-go]]: 压缩
+- [[https://code.google.com/p/goprotobuf/][goprotobuf]]: Protobuf, 不包含RPC
+- [[https://code.google.com/p/leveldb-go/][leveldb-go]]: BigTable, 将含SQL支持
+- [[https://github.com/golang/groupcache][groupcache]]: 缓冲库, 不支持修改
+- [[https://github.com/golang/glog][glog]]: 日志库
+- [[https://github.com/golang/lint][golint]]: 代码风格检查
+- [[https://code.google.com/p/vp8-go/][vp8-go]]: VP8视频, WebP图像
+
+* 数据库支持
+
+- [[https://github.com/go-sql-driver/mysql/][MySQL]] 
+- [[https://github.com/ziutek/mymysql][mymysql]]: GAE使用
+- [[https://github.com/lib/pq][PostgreSQL]]
+- SQLite(CGO): [[https://github.com/mattn/go-sqlite3][go-sqlite3]], [[https://code.google.com/p/go-sqlite/][go-sqlite]]
+- [[http://labix.org/mgo][mgo]]
+- [[http://redis.io/clients#Go][redis]] 
+- [[https://code.google.com/p/leveldb-go/][leveldb-go]]: 原生, 将支持SQL, 开发中
+
+* Go语言使用情况
+
+Google:
+
+- [[http://golang.org/][http://golang.org]]
+- [[https://developers.google.com/appengine/][Google App Engine]]
+- [[http://dl.google.com][http://dl.google.com]]
+- [[https://code.google.com/p/vitess/][Vitess]] - YouTube
+
+其他公司:
+
+- [[https://code.google.com/p/go-wiki/wiki/GoUsers][Currently using Go]]
+
+# -----------------------------------------------------------------------------
+* Go语言的未来
+# -----------------------------------------------------------------------------
+
+* Go 1.3 的改进
+
+将讨论用 *连续堆栈* 代替以前的 *分段堆栈* .
+堆栈的大小依然是动态调整的.
+
+.image chai2010-golang-intro/images/go13-stack.png 400 1000
+
+[[https://docs.google.com/document/d/1wAaf1rYoM4S4gtnPh0zOlGzWtrZFQ5suE8qr2sD8uWQ/pub][Contiguous stacks]]
+
+* 期望的特性
+
+- 内置迷你的GUI库(例如tk)
+- 增加优雅的泛型支持
+- 增加动态库支持
+- 官方IDE支持(参考Dart)
+- ...
+
+* 泛型的问题
+
+- 会导致编译性能下降(编译性能是Go的目标)
+- 泛型和函数重载类似, 会导致代码复杂化
+- 泛型和Go的类型系统不兼容, 很难优雅
+
+
+# -----------------------------------------------------------------------------
+* 代码预览
+# -----------------------------------------------------------------------------
+
+* 你好, 世界! - V2.0
+
+.play -edit chai2010-golang-intro/helloworld-v2.go /package main/,
+
+* ProtobufRPC: proto file
+
+.code chai2010-golang-intro/arith.pb/arith.proto /^package arith;/,
+
+* ProtobufRPC: Server
+
+.code chai2010-golang-intro/protorpc-server.go /^package main/,
+
+* ProtobufRPC: Go Client
+
+.code chai2010-golang-intro/protorpc-client.go /^package main/,
+
+* ProtobufRPC: C++ Client
+
+.code chai2010-golang-intro/protorpc-client-cpp.cc /^#include/,
+
+* 更多教程
+
+Go Tour
+
+.link http://tour.golang.org/ http://tour.golang.org/
+
+Effective Go
+
+.link http://golang.org/doc/effective_go.html http://golang.org/doc/effective_go.html
+
+Go Spec
+
+.link http://golang.org/ref/spec http://golang.org/ref/spec
+
+# -----------------------------------------------------------------------------
+
+* Q&A
+
+.image chai2010-golang-intro/images/bumper640x360.png 500 1000
+
+# -----------------------------------------------------------------------------
+# by chaishushan@gmail.com

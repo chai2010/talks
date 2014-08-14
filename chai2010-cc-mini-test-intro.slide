@@ -1,0 +1,208 @@
+# Copyright 2013 <chaishushan{AT}gmail.com>. All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# -----------------------------------------------------------------------------
+
+C++迷你单元测试和基准测试库
+
+chai2010
+chaishushan@gmail.com
+https://github.com/chai2010/cc-mini-test
+
+# -----------------------------------------------------------------------------
+* 设计目标
+# -----------------------------------------------------------------------------
+
+- C++便携式迷你测试库, 单线程执行
+- 支持基础的单元测试和基准测试功能
+- 支持自定义初始化和清理函数测试数据功能
+- 根据正则表达式选择运行测试功能
+
+[[https://github.com/chai2010/cc-mini-test][https://github.com/chai2010/cc-mini-test]]
+
+
+# -----------------------------------------------------------------------------
+* 单元测试
+# -----------------------------------------------------------------------------
+
+* 基本用法
+
+	#include "test.h"
+
+	int Sum(int a, int b) {
+		return a+b;
+	}
+
+	TEST(Sum, Simple) {
+		ASSERT_TRUE(Sum(1,2) == 3);
+	}
+
+运行测试: ./a.out
+
+	[test] Sum.Simple ok
+	PASS
+
+* 辅助信息
+
+	TEST(Sum, For) {
+		for(int i = 0; i < 10; ++i) {
+			ASSERT_TRUE_MSG(Sum(i,i) == i*2, "i = %d", i);
+		}
+	}
+
+- ASSERT_TRUE_MSG 提供类似 printf 的可变参数信息
+- 失败时输出信息(一般用于循环内部)
+
+# -----------------------------------------------------------------------------
+* 基准测试
+# -----------------------------------------------------------------------------
+
+* 基本用法
+
+	#include "test.h"
+
+	// 1, 1, 2, 3, 5, ...
+	int Fibonacci(int i) {
+		return (i < 2)? 1: Fibonacci(i-1) + Fibonacci(i-2);
+	}
+
+	BENCH(Fibonacci, 10) {
+		for(int i = 0; i < BenchN(); ++i) {
+			Fibonacci(10);
+		}
+	}
+	BENCH(Fibonacci, 15) {
+		for(int i = 0; i < BenchN(); ++i) {
+			Fibonacci(15);
+		}
+	}
+
+* 运行基准测试
+
+运行时指定 "-test.bench" 参数: ./a.out -test.bench:
+
+	[bench] Fibonacci.10 2000000 763 ns/op
+	[bench] Fibonacci.15 200000 8740 ns/op
+
+表示循环执行的次数和每个循环所花的时间.
+
+* 重置时钟
+
+	BENCH(Name, case1) {
+		auto big = NewBig();
+		BenchResetTimer();
+
+		for(int i = 0; i < BenchN(); ++i) {
+			big.Len();
+		}
+	}
+
+排除初始化所花的时间.
+
+* 关闭时钟
+
+	BENCH(Name, case2) {
+		BenchStopTimer();
+		auto big = NewBig();
+		BenchStartTimer();
+
+		for(int i = 0; i < BenchN(); ++i) {
+			big.Len();
+		}
+		BenchStopTimer();
+		delete big;
+	}
+
+排除无关代码的干扰.
+
+
+# -----------------------------------------------------------------------------
+* 初始化和清理工作
+# -----------------------------------------------------------------------------
+
+* 初始化工作
+
+	static int fib[10];
+
+	INIT(Fibonacci, init) {
+		fib[0] = fib[1] = 1;
+		for(int i = 2; i < sizeof(fib)/sizeof(fib[0]); ++i) {
+			fib[i] = fib[i-1] + fib[i-2];
+		}
+	}
+
+	TEST(Fibonacci, TestInit) {
+		for(int i = 0; i < sizeof(fib)/sizeof(fib[0]); ++i) {
+			ASSERT_TRUE_MSG(FibonacciFast(i) == fib[i], "i = %d", i);
+		}
+	}
+
+初始化函数在测试之前运行, 用于准备测试数据.
+
+* 清理工作
+
+	EXIT(Fibonacci, exit) {
+		// do some clean work
+	}
+
+初始化函数在测试之后运行, 用于执行清理工作.
+
+注: 如果测试失败, 清理函数则不会执行.
+
+# -----------------------------------------------------------------------------
+* 命令行参数
+# -----------------------------------------------------------------------------
+
+* 帮助信息
+
+	./a.out -help
+	C++ Mini UnitTest and Benchmark Library.
+	https://github.com/chai2010/cc-mini-test
+
+	usage: a.out
+	  [-list=.*]
+	  [-test=.*]
+	  [-test.bench=]
+	  [-test.benchtime=1second]
+	  [-help]
+	  [-h]
+
+	Report bugs to <chaishushan{AT}gmail.com>.
+
+输入 -h 或 -help 参数, 查看帮助信息.
+
+* 测试列表
+
+输入 ./a.out -list 查看测试列表:
+
+	[init] Fibonacci.init
+	[test] Sum.Simple
+	[bench] Fibonacci.10
+	[bench] Fibonacci.15
+	[exit] Fibonacci.exit
+
+* 选择运行测试
+
+只运行 Sum 测试:
+
+	./a.out -test=^Sum
+
+只运行 Fibonacci 相关的基准测试:
+
+	./a.out -test= -test.bench=^Fibonacci
+
+* 基准测试时间
+
+调整每个基准测试的时间:
+
+	./a.out -test.benchtime=5
+
+每个基准测试时间调整为 5秒钟.
+
+# -----------------------------------------------------------------------------
+
+* Q&A
+
+# -----------------------------------------------------------------------------
+# by chaishushan@gmail.com

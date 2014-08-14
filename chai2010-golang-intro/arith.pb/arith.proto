@@ -1,0 +1,24 @@
+// Copyright 2013 <chaishushan{AT}gmail.com>. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package arith; // HL
+
+// go use cc_generic_services option
+option cc_generic_services = true; // HL
+
+message ArithRequest { // HL
+	optional int32 a = 1;
+	optional int32 b = 2;
+}
+
+message ArithResponse { // HL
+	optional int32 val = 1;
+	optional int32 quo = 2;
+	optional int32 rem = 3;
+}
+
+service ArithService { // HL
+	rpc multiply (ArithRequest) returns (ArithResponse);
+	rpc divide (ArithRequest) returns (ArithResponse);
+}
