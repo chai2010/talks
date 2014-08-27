@@ -1,0 +1,151 @@
+# Copyright 2013 <chaishushan{AT}gmail.com>. All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# -----------------------------------------------------------------------------
+
+Go/C++语言Protobuf-RPC简介
+
+chai2010
+chaishushan@gmail.com
+https://github.com/chai2010
+
+# -----------------------------------------------------------------------------
+* Hello 世界!
+# -----------------------------------------------------------------------------
+
+Go
+
+.play -edit chai2010-protorpc-intro/helloworld.go /package main/,
+
+C++
+
+.play -edit chai2010-protorpc-intro/helloworld_cc.go /#include/,/CC END/
+
+# -----------------------------------------------------------------------------
+* 直接函数调用
+# -----------------------------------------------------------------------------
+
+* 直接函数调用 - Go
+
+.play -edit chai2010-protorpc-intro/local-get.go /package main/,
+
+* 直接函数调用 - C++
+
+.code -edit chai2010-protorpc-intro/local-get.cc /bool Get/,
+
+# -----------------------------------------------------------------------------
+* 间接函数调用
+# -----------------------------------------------------------------------------
+
+* 间接函数调用 - Go
+
+.play -edit chai2010-protorpc-intro/local-get-proxy.go /func Call/,
+
+* 间接函数调用 - C++
+
+.play -edit chai2010-protorpc-intro/local-get-proxy.cc /bool Call/,
+
+* 间接函数调用 - 人肉版(01)
+
+1. 工作背景
+
+	调用者: 张三;
+	被调用者: 李四, 有Get技能;
+	运行环境: 代理公司(买了张三,李四的信息)
+
+2. 发出调用请求
+
+	张三 用中文(编码方式), 普通话(传输媒介), 代理公司(运行环境)发出Get调用请求
+	等待回复...
+
+3. 代理公司(环境)
+
+	客服 收到 张三 用中文(编码方式), 普通话(传输媒介) 发来的Get调用请求
+	客服 检索到 李四 有Get技能
+	客服 直接 向 李四 提出 Get 请求
+	等待回复...
+
+* 间接函数调用 - 人肉版(02)
+
+4. 执行函数调用
+
+	李四收到 Get 请求 后, 将数据拷到U盘(编码方式), 让邮局寄回(传输媒介)到代理公司
+
+5. 获取结果
+
+	代理公司 将从 李四 发来的包裹 转发给 张三
+	张三 收到 U盘, 拷贝数据
+	...
+
+# -----------------------------------------------------------------------------
+* RPC 工作原理
+# -----------------------------------------------------------------------------
+
+* RPC 工作原理图
+
+.image chai2010-protorpc-intro/images/rpc.png 450 650
+
+* RPC 几个核心概念
+
+- 调用者 (只发出请求, 不关心是谁, 怎么样去完成)
+- 被调用者 (只负责完成请求, 不关心是谁需要该数据)
+- 调用者 和 被调用者 的中间代理人 (RPC调用框架)
+- 数据的打包(比如 中文/鸟语 等)
+- 数据的传输方式(比如 电话/TCP 等)
+
+# -----------------------------------------------------------------------------
+* Protobuf-RPC
+# -----------------------------------------------------------------------------
+
+* Protobuf-RPC 特点
+
+- 采用 Protobuf 作为编码方式
+- C++ 版本采用 TCP 作为传输媒介
+- Go 版本可自定义传输媒介
+- 采用 Snappy 压缩
+- 提供 MD5 校验
+
+* Protobuf-RPC 优势
+
+- 简化网络程序的开发
+- 跨不同的编程语言通讯(Go/C++)
+- 跨不同的操作系统通讯(Windows/Linux)
+- 降低网络浏览(Snappy压缩)
+- 增加数据安全(MD5校验)
+
+* Protobuf-RPC 服务端 - Go
+
+.play -edit chai2010-protorpc-intro/protorpc-hello-server.go /package main/,
+
+* Protobuf-RPC 客户端 - Go
+
+.play -edit chai2010-protorpc-intro/protorpc-hello-client.go /package main/,
+
+* Protobuf-RPC 服务端 - C++
+
+.code -edit chai2010-protorpc-intro/protorpc-hello-server.cc /#include/,
+
+* Protobuf-RPC 客户端 - C++
+
+.code -edit chai2010-protorpc-intro/protorpc-hello-client.cc /#include/,
+
+# -----------------------------------------------------------------------------
+* Q&A
+# -----------------------------------------------------------------------------
+
+.image chai2010-protorpc-intro/images/bumper640x360.png 500 1000
+
+* 参考信息
+
+Go文档
+
+[[http://godoc.org/github.com/chai2010/protorpc][http://godoc.org/github.com/chai2010/protorpc]]
+
+C++例子
+
+[[http://github.com/chai2010/protorpc.cxx/tree/master/tests/rpctest][http://github.com/chai2010/protorpc.cxx/tree/master/tests/rpctest]]
+
+# -----------------------------------------------------------------------------
+# by chaishushan@gmail.com
+

@@ -2,12 +2,18 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package message;
+package hello;
 
-message EchoRequest {
+option cc_generic_services = true;
+
+message HelloRequest {
 	optional string msg = 1;
 }
 
-message EchoResponse {
+message HelloResponse {
 	optional string msg = 1;
+}
+
+service HelloService {
+	rpc Hello (HelloRequest) returns (HelloResponse);
 }
