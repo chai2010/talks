@@ -1,4 +1,4 @@
-# Copyright 2013 <chaishushan{AT}gmail.com>. All rights reserved.
+# Copyright 2014 <chaishushan{AT}gmail.com>. All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
@@ -83,10 +83,18 @@ C++
 6. 完成
 
 # -----------------------------------------------------------------------------
-* RPC 工作原理
+* 远程函数调用(RPC)
 # -----------------------------------------------------------------------------
 
-* RPC 工作原理图
+* RPC简介
+
+- RPC 是 Remote Procedure Call 的缩写, 即 远程过程/函数调用
+- RPC 的一个特例 LPC (Local Procedure Call), 为本地过程/函数调用
+- RPC 一般用于进程间或跨网络通讯(进程内接调用函数性能更好)
+- RPC 具有很好的横向扩展的能力, 比较适合网络/分布式环境通讯
+
+
+* RPC 工作原理
 
 .image chai2010-protorpc-intro/images/rpc.png 450 650
 
@@ -98,11 +106,7 @@ C++
 - 数据的打包方式(比如 中文/鸟语 等)
 - 数据的传输方式(比如 电话/TCP 等)
 
-# -----------------------------------------------------------------------------
-* Protobuf-RPC
-# -----------------------------------------------------------------------------
-
-* Protobuf-RPC 特点
+* Protobuf-RPC 简介
 
 - 采用 Protobuf 作为编码方式
 - C++ 版本采用 TCP 作为传输媒介
@@ -110,13 +114,33 @@ C++
 - 采用 Snappy 压缩
 - 提供 MD5 校验
 
-* Protobuf-RPC 优势
+* Protobuf-RPC 优点
 
 - 简化网络程序的开发
+- 由Protobuf保证接口的稳健性
 - 跨不同的编程语言通讯(Go/C++)
 - 跨不同的操作系统通讯(Windows/Linux)
 - 降低网络浏览(Snappy压缩)
 - 增加数据安全(MD5校验)
+
+# -----------------------------------------------------------------------------
+* Protobuf-RPC 示例
+# -----------------------------------------------------------------------------
+
+* 定义接口
+
+.code -edit chai2010-protorpc-intro/hello.pb/hello.proto /package hello/,
+
+
+* 生成代码
+
+生成Go代码(依赖protoc-gen-go插件):
+
+	protoc --go_out=. hello.proto [...]
+
+生成C++代码(采用定制的protoc工具):
+
+	protoc --cxx_out=. hello.proto [...]
 
 * Protobuf-RPC 服务端 - Go
 
@@ -140,7 +164,7 @@ C++
 
 .image chai2010-protorpc-intro/images/bumper640x360.png 500 1000
 
-* 参考信息
+* 参考资料
 
 Go文档
 

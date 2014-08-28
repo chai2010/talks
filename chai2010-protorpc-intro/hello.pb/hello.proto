@@ -4,7 +4,7 @@
 
 package hello;
 
-option cc_generic_services = true;
+option cc_generic_services = true; // HL
 
 message HelloRequest {
 	optional string msg = 1;
@@ -14,6 +14,6 @@ message HelloResponse {
 	optional string msg = 1;
 }
 
-service HelloService {
-	rpc Hello (HelloRequest) returns (HelloResponse);
+service HelloService { // HL
+	rpc Hello (HelloRequest) returns (HelloResponse); // HL
 }
