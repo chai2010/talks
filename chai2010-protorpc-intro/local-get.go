@@ -15,7 +15,7 @@ func Get(filename string) (data []byte, err error) { // HL
 }
 
 func main() {
-	data, err := Get("./chai2010-protorpc-intro/helloworld.go") // HL
+	data, err := Get("./chai2010-protorpc-intro/local-get.go") // HL
 	if err != nil {
 		log.Fatal(err)
 	}

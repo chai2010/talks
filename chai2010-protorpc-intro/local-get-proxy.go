@@ -24,7 +24,7 @@ func Call(method string, filename string) (data []byte, err error) { // HL
 }
 
 func main() {
-	data, err := Call("GetX", "./chai2010-protorpc-intro/helloworld.go") // fixit // HL
+	data, err := Call("GetX", "./chai2010-protorpc-intro/local-get-proxy.go") // fixit // HL
 	if err != nil {
 		log.Fatal(err)
 	}

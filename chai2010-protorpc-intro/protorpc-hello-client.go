@@ -5,8 +5,8 @@
 package main
 
 import (
-	"fmt" // OMIT
-	"log" // OMIT
+	"fmt"
+	"log"
 	// OMIT
 	"code.google.com/p/goprotobuf/proto"
 	hello "github.com/chai2010/talks/chai2010-protorpc-intro/hello.pb" // HL

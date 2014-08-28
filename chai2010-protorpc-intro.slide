@@ -20,7 +20,7 @@ Go
 
 C++
 
-.play -edit chai2010-protorpc-intro/helloworld_cc.go /#include/,/CC END/
+.play -edit chai2010-protorpc-intro/helloworld.cc.go /CC START/,/CC END/
 
 # -----------------------------------------------------------------------------
 * 直接函数调用
@@ -32,7 +32,7 @@ C++
 
 * 直接函数调用 - C++
 
-.code -edit chai2010-protorpc-intro/local-get.cc /bool Get/,
+.play -edit chai2010-protorpc-intro/local-get.cc.go /CC START/,/CC END/
 
 # -----------------------------------------------------------------------------
 * 间接函数调用
@@ -44,7 +44,7 @@ C++
 
 * 间接函数调用 - C++
 
-.play -edit chai2010-protorpc-intro/local-get-proxy.cc /bool Call/,
+.play -edit chai2010-protorpc-intro/local-get-proxy.cc.go /CC START/,/CC END/
 
 * 间接函数调用 - 人肉版(01)
 
