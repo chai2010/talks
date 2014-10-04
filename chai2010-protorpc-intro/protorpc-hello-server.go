@@ -7,8 +7,8 @@ package main
 import (
 	"log"
 	// OMIT
-	"code.google.com/p/goprotobuf/proto"
-	hello "github.com/chai2010/talks/chai2010-protorpc-intro/hello.pb"  // HL
+	"github.com/chai2010/protorpc/proto"
+	hello "github.com/chai2010/talks/chai2010-protorpc-intro/hello.pb" // HL
 )
 
 type myHello struct{}

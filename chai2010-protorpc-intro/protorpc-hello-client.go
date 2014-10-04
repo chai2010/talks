@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"log"
 	// OMIT
-	"code.google.com/p/goprotobuf/proto"
+	"github.com/chai2010/protorpc/proto"
 	hello "github.com/chai2010/talks/chai2010-protorpc-intro/hello.pb" // HL
 )
 
