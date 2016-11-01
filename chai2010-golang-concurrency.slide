@@ -1,0 +1,150 @@
+# Copyright 2013 <chaishushan{AT}gmail.com>. All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# -----------------------------------------------------------------------------
+
+Go语言并发编程
+
+chai2010
+chaishushan@gmail.com
+https://github.com/chai2010
+
+# -----------------------------------------------------------------------------
+
+* 自我介绍(chai2010)
+
+- [[https://golang.org/CONTRIBUTORS][Go语言代码贡献者]]
+- [[https://github.com/golang-china/gopl-zh][Go语言圣经]]翻译者
+- [[https://github.com/golang-china][Go语言中文文档]]翻译者
+- [[https://groups.google.com/forum/#!forum/golang-china][golang-china]] 邮件列表初始创建者和维护者
+- [[https://code.google.com/p/go/source/browse/misc/notepadplus/README][notepad++]]等功能的完善和实现([[https://code.google.com/p/go/source/browse/misc/notepadplus/userDefineLang.xml][语法高亮]]/[[https://code.google.com/p/go/source/browse/misc/notepadplus/go.xml][内建函数自动补全]]/[[https://code.google.com/p/go/source/browse/misc/notepadplus/functionList.xml][函数列表]]等)
+- Github: [[https://github.com/chai2010][https://github.com/chai2010]]
+- QQ群: 102319854
+
+.image chai2010-golang-asm-intro/images/frontpage.png
+
+
+# -----------------------------------------------------------------------------
+* 你好, 并发!
+# -----------------------------------------------------------------------------
+
+* 并发很简单
+
+.play chai2010-golang-concurrency/hello.go /package main/,
+
+- go关键字启动一个Goroutine
+- 请分析程序的运行状态
+
+* 解决并发中的小问题
+
+.play chai2010-golang-concurrency/hello-v2.go /package main/,
+
+- 请分析程序的运行状态
+- time.Sleep 的作用?
+
+* WTF! Go语言的并发真的是弱爆了!
+
+.play chai2010-golang-concurrency/hello-v3.go /func main/,
+
+- 请分析程序的运行状态
+
+* 并发小问题分析
+
+前面代码运行有一定的随机性, 无法保证并发程序的正确运行.
+
+并发的几个原则:
+
+- go启动goroutine时无法保证新线程马上运行
+- main退出时程序退出
+
+解决的思路:
+
+- 后台gotoutine完成之前main函数不能退出.
+
+* 暴力一点: 不要让main函数退出!
+
+.play chai2010-golang-concurrency/hello-v4.go /func main/,
+
+- 后台的打印工作可以保证完成(有问题吗?)
+- main 函数永远不会退出(没问题)
+
+
+* 见了鬼了: main函数居然占着茅坑不拉屎!
+
+.play chai2010-golang-concurrency/hello-v5.go /func main/,
+
+- `for {}` 死循环保证了main函数不会退出, 但是依然占用了 CPU 资源
+- 当只有一个系统线程资源时, main 将独占CPU, 其它线程被饿死
+
+* 让不拉屎的main函数先站在茅坑边上等着!
+
+.play chai2010-golang-concurrency/hello-v6.go /func main/,
+
+- `select {}` 保证了main函数不会退出, 不占用了 CPU 资源
+- 即使只有一个系统线程资源时, 后台线程依然有机会执行
+
+* 虐待main函数的方法当然不止一种...
+
+.play chai2010-golang-concurrency/hello-v7.go /func main/,
+
+- `<-make(chan int)` 保证了main函数不会退出, 不占用了 CPU 资源
+- 即使只有一个系统线程资源时, 后台线程依然有机会执行
+
+* 崩溃: 居然都不拉屎了 - 阻塞导致死锁异常
+
+.play chai2010-golang-concurrency/hello-v8.go /func main/,
+
+- main 因为阻塞导致永远不会退出
+- 没有其它可运行的goroutine导致异常
+
+注意:
+
+- `for {}` 死循环并不会导致死锁异常
+
+* 要做好Goroutine的善后工作
+
+.play chai2010-golang-concurrency/hello-v9.go /func main/,
+
+- main 函数阻塞
+- 直到 done 管道有数据
+- 当 done 管道有数据时, 后台 Goroutine 必然已经完成工作
+- 完美的并发!
+
+* 充分利用并发资源
+
+.play chai2010-golang-concurrency/hello-v10.go /func main/,
+
+- 充分利用了系统的并发资源
+- 输出顺序有一定的随机性
+- main退出时工作全部完成
+
+* 充分利用sync标准库
+
+.play chai2010-golang-concurrency/hello-v11.go /func main/,
+
+- sync.WaitGroup 用于等待一组并发体完成
+
+# -----------------------------------------------------------------------------
+# 并发的内存模型
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+# 常见的并发模式
+# -----------------------------------------------------------------------------
+
+# Once 代码分析
+
+# -----------------------------------------------------------------------------
+# END
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+# END
+# -----------------------------------------------------------------------------
+
+
+
+
