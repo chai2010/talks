@@ -277,13 +277,150 @@ https://github.com/chai2010
 * 常见的并发模式
 # -----------------------------------------------------------------------------
 
-# Once 代码分析
+* 素数筛(01) - 原理
 
-# 素数筛
+.image chai2010-golang-concurrency/prime-sieve.png 500 1000
 
-# -----------------------------------------------------------------------------
-# END
-# -----------------------------------------------------------------------------
+* 素数筛(02) - 自然数管道
+
+返回生成自然数序列的管道: 2, 3, 4, ...
+
+.code -edit chai2010-golang-concurrency/prime_sieve.go /^func GenerateNatural/,/^}/
+
+* 素数筛(03) - 素数筛管道
+
+管道过滤器: 删除能被素数整除的数
+
+.code -edit chai2010-golang-concurrency/prime_sieve.go /^func PrimeFilter/,/^}/
+
+* 素数筛(04) - 菊花链
+
+.play -edit chai2010-golang-concurrency/prime_sieve.go /^func main/,/^}/
+
+
+* 赢者为王
+
+	func main() {
+		ch := make(chan string, 32)
+
+		go func() {
+			ch <- searchByBing("golang")
+		}
+		go func() {
+			ch <- searchByGoogle("golang")
+		}
+		go func() {
+			ch <- searchByBaidu("golang")
+		}
+
+		fmt.Println(<-ch)
+	}
+
+- 启动多个冗余的Goroutine, 返回第一个结果
+- 虽然可能会有一定的CPU浪费, 但是以最快速度返回结果
+
+* 监控并发数(01)
+
+	type gate chan bool
+
+	func (g gate) enter() { g <- true }
+	func (g gate) leave() { <-g }
+
+	func (g gate) Len() int { return len(g) }
+	func (g gate) Cap() int { return cap(g) }
+
+	func (g gate) Idle() bool { return len(g) == 0 }
+	func (g gate) Busy() bool { return len(g) == cap(g) }
+
+	func (g gate) Fraction() float64 {
+		return float64(len(g)) / float64(cap(g))
+	}
+
+- gate 是带缓存的管道
+- 通过 enter/leave 来控制最大并发数目
+- 通过利用率来判断并发层度
+
+* 监控并发数(02)
+
+	type gatefs struct {
+		fs vfs.FileSystem
+		gate
+	}
+
+	func (fs gatefs) Lstat(p string) (os.FileInfo, error) {
+		fs.enter()
+		defer fs.leave()
+		return fs.fs.Lstat(p)
+	}
+
+- 每个函数通过 enter/leave 来控制并发数目
+
+* 监控并发数(03)
+
+	func New(fs vfs.FileSystem, gate chan bool) *gatefs {
+		p := &gatefs{fs, gate}
+		// 后台监控线程
+		go func() {
+			for {
+				switch {
+				case p.gate.Idle():
+					// 处理后台任务
+				case p.gate.Fraction() >= 0.7:
+					// 并发预警
+				default:
+					time.Sleep(time.Second)
+				}
+			}
+		}()
+		return p
+	}
+
+- 根据并发的层度和CPU的压力来调整资源分配
+- CPU空闲时, 可以执行一些低级别的任务
+- 达到一定并发比率时, 提供预警
+
+* context包(01)
+
+	func worker(ctx context.Context, wg *sync.WaitGroup) error {
+		defer wg.Done()
+
+		for {
+			select {
+			default:
+				fmt.Println("hello")
+			case <-ctx.Done():
+				return ctx.Err()
+			}
+		}
+	}
+
+- select 多路选择管道
+- 带 default 分支, 非阻塞
+- ctx.Done() 可实现超时和退出操作
+
+* context包(02)
+
+	func main() {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+		var wg sync.WaitGroup
+		for i := 0; i < 10; i++ {
+			wg.Add(1)
+			go worker(ctx, &wg)
+		}
+
+		time.Sleep(time.Second)
+		cancel()
+
+		wg.Wait()
+	}
+
+- ctx 有超时限制, 并且可主动退出
+
+* 海量请求的处理思路
+
+- 海量请求先存入一个带较大缓冲的管道中, 缓冲大小可能是数千或数万
+- 构建后台线程池, 各自从带缓存的管道取任务执行
 
 
 # -----------------------------------------------------------------------------
