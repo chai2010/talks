@@ -1,0 +1,593 @@
+# Copyright 2013 <chaishushan{AT}gmail.com>. All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# -----------------------------------------------------------------------------
+
+Go汇编语言简介
+
+chai2010
+chaishushan@gmail.com
+https://github.com/chai2010
+
+# -----------------------------------------------------------------------------
+
+* 自我介绍(chai2010)
+
+- [[https://golang.org/CONTRIBUTORS][Go语言代码贡献者]]
+- [[https://github.com/golang-china/gopl-zh][Go语言圣经]]翻译者
+- [[https://github.com/golang-china][Go语言中文文档]]翻译者
+- [[https://groups.google.com/forum/#!forum/golang-china][golang-china]] 邮件列表初始创建者和维护者
+- [[https://github.com/chai2010/notepadplus-go][notepad++]] Go语言支持插件(高亮/函数列表/支持Go汇编)
+
+- chaishushan{AT}gmail.com
+- Github: [[https://github.com/chai2010][https://github.com/chai2010]]
+- QQ群: 102319854
+
+.image chai2010-golang-asm-intro/images/frontpage.png
+
+# -----------------------------------------------------------------------------
+* 汇编语言的优缺点
+# -----------------------------------------------------------------------------
+
+* 汇编语言的优势
+
+- 汇编语言是软件不可缺少的组成部分
+- 需要bootstrap的地方依然需要汇编完成(操作系统)
+- 某些特殊低层次的任务只能由汇编完成, 比如 栈的伸缩/上下文的切换 等
+- 对于CPU密集型的任务, 需要依靠汇编来达到终极优化的目标(MMX等指令)
+- 要实现对CPU完全的控制, 需要通过汇编访问相关指令
+- 对于理解软件的运行机制很有帮助
+
+* 汇编语言的劣势
+
+- 编写困难, 维护困难
+- 不同的CPU之间不可移植, 工作量巨大
+- 有些功能只能在Go中完成(比如含指针的数据, 包的声明等)
+- Go汇编函数不支持内联优化
+- Go汇编的文档教程非常少
+
+* Donald Knuth 是怎么说的?
+
+Some people say that having machine language, at all, was the great mistake that I made. I really don’t think you can write a book for serious computer programmers unless you are able to discuss low-level detail.
+
+有人说使用机器语言, 从根本上来说, 是我所范的最大的错误. 但是我真的认为, 只有有能力讨论底层细节, 才可以为严肃的计算机码农写书.
+
+同样: *只有有能力讨论Go底层的汇编语言*, *才可以成为严肃的Go语言码农!*
+
+
+# -----------------------------------------------------------------------------
+* 初识Go汇编语言
+# -----------------------------------------------------------------------------
+
+* Go汇编语言是什么
+
+- Go语言的底层专用汇编语言
+- 从Plan9的汇编语言演化而来
+- 针对Go语言的自动垃圾回收等语言特性做了改进
+- 是Go语言的一部分, 不能单独使用
+- 只支持gc工具链, 不支持gccgo
+
+.image chai2010-golang-asm-intro/images/spaceglenda37.png
+
+* Go汇编语言是一种高级汇编语言
+
+- 和操作系统无关
+- 提供 FP/PC/SB/SP 伪寄存器, 提供统一的虚拟CPU模型
+- 和CPU架构无关的语法, 主要是指令和通用寄存器的差异
+- 和CPU架构无关的指令, 比如 CALL 和 RET 等指令
+- 汇编函数的开头和尾部可能会被加入辅助代码
+- 汇编指令并不是一一对应到真实的机器指令
+- 一些没有用到的语句可能会被删除
+
+* Plan9汇编语言
+
+大约在1986年, Go语言之父Ken Thompson为National 32000编写了C语言编译器.
+该C编译器生成的是伪汇编代码, 最终有连接器生成真正的机器指令.
+
+Plan9汇编也就是以类似的方式书写这种伪汇编代码.
+
+	MOVW  $0, var // 将 0 传输到 var 变量
+
+但是链接生成的真实代码可能这样的:
+
+	XORW  R1, R1  // 将 R1 寄存器置0
+	STORE R1, var // 将 R1 寄存器值保存到 var 变量
+
+汇编器虽然发出的是 MOVW 指令, 但是连接器最终生成的是 XORW 和 STORE 指令.
+这在Plan9汇编语言的术语将叫 指令的再分发.
+
+还有用于过程调用返回的 RET 指令, 最终可能是 RET 或 JMP LR 或 JMP (R31) 等.
+
+* Go汇编语言
+
+在Go1.3之前, 使用的是Plan9的汇编器(5a/6a/8a).
+
+从Go1.3开始, 引入了一个 liblink 的库(对应Go1.5的obj包).
+Go编译器不再生成Go汇编代码, 而且直接生成真实的机器码.
+虽然编译速度会编码, 但是最终的link速度加快了很多.
+
+Go汇编器使用的是同样的代码(liblink或Go1.5之后的obj包).
+Go1.5之后用纯Go重新实现了汇编器, 5a/6a/8a不再存在.
+
+编译/汇编/链接 全部对应到以下三个命令:
+
+	go tool compile
+	go tool asm  # 或 go tool compile -S x.go
+	go tool link
+
+从此, 跨平台交叉编译变得异常简单, 只要设置GOOS/GOARCH即可.
+
+* 例子: Add 函数
+
+.code chai2010-golang-asm-intro/add/add_generic.go /package add/,
+
+对于这个简单的Go函数, 我们看看对应的汇编实现是怎么样的.
+
+* Add: 32-bit x86 (386)
+
+	// func Add(a, b int) int
+	TEXT ·Add(SB), $0-12
+		MOVL a+0(FP), AX
+		ADDL b+4(FP), AX
+		MOVL AX, ret+8(FP)
+		RET
+
+* Add: 64-bit x86 (amd64)
+
+	// func Add(a, b int) int
+	TEXT ·Add(SB), $0-24
+		MOVQ a+0(FP), AX
+		MOVQ b+8(FP), BX
+		ADDQ AX, BX
+		MOVQ AX, ret+16(FP)
+		RET
+
+* Add: 32-bit arm
+
+	// func Add(a, b int) int
+	TEXT ·Add(SB), $-4-12
+		MOVW a+0(FP), R0
+		MOVW b+4(FP), R1
+		ADD  R1, R0
+		MOVW R0, ret+8(FP)
+		RET
+
+* Add: 64-bit arm (arm64)
+
+	// func Add(a, b int) int
+	TEXT ·Add(SB), $-8-24
+		MOVD a+0(FP), R0
+		MOVD b+8(FP), R1
+		ADD  R1, R0
+		MOVD R0, ret+16(FP)
+		RET
+
+* Add: 简单说明
+
+- 这几个版本的汇编程序很相似
+- 仅有的差异主要在寄存器和机器指令部分
+- RET伪指令依然隐藏了很多不同CPU之间的差异
+- 采用的是Ken's National 32000类似的汇编语法
+
+- 原来Go汇编语言真的很简单!
+
+
+# -----------------------------------------------------------------------------
+* Go汇编语言详解
+# -----------------------------------------------------------------------------
+
+* 寄存器说明
+
+Go汇编语言预定义了4个伪寄存器, 用于简化机器模型:
+
+- FP: 函数帧寄存器, 用于函数参数和返回值和局部变量(局部变量是否有问题?).
+- PC: 指令计数器(并不是指令的字节大小, 不用担心指令长度不同的影响).
+- SB: 静态基址指针, 用于包级别的全局变量.
+- SP: 栈指针, 有虚拟SP和实SP之分, 可用于局部变量和子函数调用的参数.
+
+注: 没有特殊说明时, 均对应 AMD64 平台的汇编.
+
+* 指令格式说明
+
+数据从左向右移动
+
+	- ADD R1, R2     // R2 += R1
+	- SUB R3, R4, R5 // R5 = R4 - R3
+	- MUL $7, AX     // AX *= 7
+
+内存寻址格式: offset + reg1 + reg2*scale
+
+	- MOV (R1), R2         // R2 = *R1
+	– MOV 8(R3), R4        // R4 = *(8 + R3)
+	– MOV 16(R5)(R6*1), R7 // R7 = *(16 + R5 + R6*1)
+	– MOV ·myvar(SB), R8   // R8 = *myvar (myvar为包级变量)
+
+取地址:
+
+	– MOV $8(R1)(R2*1), R3 // R3 = 8 + R1 + R2
+	– MOV $·myvar(SB), R4  // R4 = &myvar (myvar为包级变量)
+
+* 符号绝对路径的展开
+
+Go语言中符号的绝对路径有包路径和包内的符号名共同决定.
+例如 fmt.Printf 和 math/rand.Int.
+
+但是在Go汇编语言中, "."和"/" 都有特殊用途, 需要用 "·"和"∕"替代.
+Unicode码点对应为U+00B7和U+2215, 汇编器最终会替换回"."和"/"字符.
+在汇编中应该用 fmt·Printf 和 math∕rand·Int 访问.
+
+如果一个符号以"·"开头, 汇编器会将当前包的路径添加到符号的开头.
+
+* 包级变量
+
+	DATA  ·zero+0(SB)/8,$0
+	GLOBL ·pi(SB),RODATA,$8
+
+	DATA  pkgname·zero+0(SB)/8,$0
+	GLOBL pkgname·pi(SB),RODATA,$8
+
+- 基于 SB 伪寄存器定义
+- DATA 指令指定符号/偏移量, 内存大小(1/2/4/8), 对应的值
+- GLOBL 导出符号对应的变量和内存大小, 可以设置 RODATA 等只读属性
+
+* 文件内变量
+
+	DATA  text<>+0(SB)/8,$"Hello Wo"
+	DATA  text<>+8(SB)/8,$"rld!\n"
+	GLOBL text<>(SB),RODATA,$16
+
+- 符号名以 <> 后缀, 只能在当前汇编源文件内部访问
+
+
+* 函数定义
+
+.image chai2010-golang-asm-intro/images/func-decl.png
+
+* 函数参数和返回值
+
+	// func If(ok bool, a, b int) int
+	TEXT ·If(SB), NOSPLIT, $0-32
+		MOVBQZX ok+0(FP), AX // ok
+		MOVQ a+8(FP), BX     // a
+		MOVQ b+16(FP), CX    // b
+		...
+		MOVQ CX, ret+24(FP)  // return b
+		RET
+
+- ok+0(FP), 第一个bool型参数, 但是在栈中占8个字节
+- MOVBQZX指令是将一个Byte加载到8字节的AX中, 不足部分用0填充
+- 参数名需要指定名字, 并且和Go中声明的名字匹配
+- 32位系统的int64参数的高/低32位可以用 _lo 和 _hi 后缀指定
+- go vet 工具可以检测参数的名字格式和栈帧的大小
+- 返回值也是函数参数的一个部分(在末尾)
+
+* 跳转和分支(01)
+
+.image chai2010-golang-asm-intro/images/jmp.png
+
+- 基于 Label 的绝对位置跳转
+- 基于 PC 的相对位置跳转
+
+* 跳转和分支(02)
+
+	// func If(ok bool, a, b int) int
+	TEXT ·If(SB), NOSPLIT, $0-32
+		MOVBQZX ok+0(FP), AX // ok
+		MOVQ a+8(FP), BX     // a
+		MOVQ b+16(FP), CX    // b
+		CMPQ AX, $0          // test ok
+		JEQ  3(PC)           // if !ok, skip 2 line
+		MOVQ BX, ret+24(FP)  // return a
+		RET
+		MOVQ CX, ret+24(FP)  // return b
+		RET
+
+- 基于 PC 的跳转, 近距离跳转比较方便
+- 避免定义很多 Label
+
+* 循环语句
+
+	// func SumSlice(s []int) int
+	TEXT ·SumSlice(SB), NOSPLIT, $0-32
+		MOVQ s+0(FP), AX     // &s[0]
+		MOVQ s_len+8(FP), BX // len(s)
+		MOVQ $0, CX          // sum = 0
+
+	loop:
+		CMPQ BX, $0          // compare cnt,0
+		JLE  end             // if cnt <= 0: goto end
+		DECQ BX              // cnt--
+		ADDQ (AX), CX        // sum += s[i]
+		ADDQ $8, AX          // i++
+		JMP  loop            // goto loop
+
+	end:
+		MOVQ CX, ret+24(FP)  // return sum
+		RET
+
+* 函数调用
+
+	// func PrintInt(x int)
+	TEXT ·PrintInt(SB), $8-8
+		NO_LOCAL_POINTERS
+		MOVQ x+0(FP), AX
+		MOVQ AX, 0(SP)
+		CALL runtime·printint(SB)
+		RET
+
+* 包级变量(01)
+
+Go源文件定义的Int变量和函数签名:
+
+	var gopkgValue int = 42
+
+	func GetPkgValue() int
+
+汇编中访问:
+
+	// func GetPkgValue() int
+	TEXT ·GetPkgValue(SB), NOSPLIT, $0-8
+		MOVQ ·gopkgValue(SB), AX
+		MOVQ AX, ret+0(FP)
+		RET
+
+* 包级变量(02) - 复杂结构
+
+Go源文件定义的PkgInfo变量和函数签名:
+
+	type PkgInfo struct {
+		V0 byte
+		V1 uint16
+		V2 int32
+		V3 int64
+		V4 bool
+		V5 bool
+	}
+
+	var gInfo PkgInfo
+
+	func GetPkgInfo() PkgInfo
+
+* 包级变量(03) - 复杂结构
+
+汇编中访问:
+
+	// func GetPkgInfo() PkgInfo
+	TEXT ·GetPkgInfo(SB), NOSPLIT, $0-24
+		MOVBLZX ·gInfo+0(SB), AX      // .V0 byte
+		MOVQ    AX, ret+0(FP)
+		MOVWLZX ·gInfo+2(SB), AX      // .V1 uint16
+		MOVQ    AX, ret+2(FP)
+		MOVLQZX ·gInfo+4(SB), AX      // .V2 int32
+		MOVQ    AX, ret+4(FP)
+		MOVQ    ·gInfo+8(SB), AX      // .V3 int32
+		MOVQ    AX, ret+8(FP)
+		MOVBLZX ·gInfo+(16+0)(SB), AX // .V4 bool
+		MOVQ    AX, ret+(16+0)(FP)
+		MOVBLZX ·gInfo+(16+1)(SB), AX // .V5 bool
+		MOVQ    AX, ret+(16+1)(FP)
+		RET
+
+* 局部变量
+
+- 局部变量尽量基于寄存器保存
+- 如果寄存器不够的话, 可以在函数定义栈帧大小时预留空间
+- 局部变量一般基于 SP 寄存器访问
+- tmp-4(SP) 负的偏移量对应伪 SP
+- tmp+4(SP) 正的偏移量对应实 SP (386/AMD64平台)
+- 伪 SP 的 -framesize(SP) 和 实 SP +0(SP) 对应一个位置?
+
+* 栈的伸缩
+
+叶子函数一般可以指定 NOSPLIT 标志参数, 表示不分裂栈
+
+如果没有指定 NOSPLIT 参数, 且没有局部指针变量, 函数开始
+需要用 NO_LOCAL_POINTERS 标识.
+
+一般尽量避免在Go汇编函数内部申请或是否内存对象.
+
+同时尽量避免在汇编中定义数据, Go中定义会更简洁.
+
+* 函数调用规范
+
+.image chai2010-golang-asm-intro/images/stack-frame.png
+
+* 标志参数
+
+- NOPROF = 1: TEXT参数, 禁止Profile剖析功能. 已经废弃.
+- DUPOK = 2: DATA参数, 是否允许一个符号对应多个实体. 由连接器选择那个实体. 此为Alef用参数, Go可以忽略.
+- NOSPLIT = 4: TEXT参数, 禁止生成栈伸缩代码. 但是函数和任何被被调用函数的全部栈帧大小必须明确指定. 一般是叶子函数使用.
+- RODATA = 8: DATA和GLOBL参数, 针对只读数据(隐含NOPTR属性).
+- NOPTR = 16: DATA和GLOBL参数, 数据中没有指针, GC垃圾回收器不要扫描.
+- WRAPPER = 32: TEXT参数, 包装函数, recover时不参与函数计数.
+- NEEDCTXT = 64: TEXT参数, 用于闭包函数传递上下文环境.
+- TLSBSS = 256: 分配一个字用于记录线程内变量的偏移地址.
+- NOFRAME = 512: TEXT参数, 不分配栈帧, 仅针对栈帧为0的函数.
+
+* 汇编语言未包含的机器指令
+
+	// uint64 atomicload64(uint64 volatile* addr);
+	TEXT runtime·atomicload64(SB), NOSPLIT, $0-12
+		MOVL  ptr+0(FP), AX
+		TESTL $7, AX
+		JZ    2(PC)
+		MOVL  0, AX // crash with nil ptr deref
+		LEAL  ret_lo+4(FP), BX
+		BYTE  $0x0f; BYTE $0x6f; BYTE $0x00 // MOVQ (%EAX), %MM0
+		BYTE $0x0f; BYTE $0x7f; BYTE $0x03  // MOVQ %MM0, 0(%EBX)
+		BYTE $0x0F; BYTE $0x77              // EMMS
+		RET
+
+# -----------------------------------------------------------------------------
+* 简单的C预处理命令
+# -----------------------------------------------------------------------------
+
+* include 包含其他文件
+
+	#include "funcdata.h"
+	#include "textflag.h"
+
+- runtime 目录的路径会自动包含
+- 很少需要自己写头文件的情形
+
+* define 定义常量
+
+	#define NOPROF   1
+	#define DUPOK    2
+	#define NOSPLIT  4
+	#define RODATA   8
+	#define NOPTR    16
+	#define WRAPPER  32
+	#define NEEDCTXT 64
+
+- 支持常量表达式, 按照Go语言的规则
+
+* define 定义宏函数
+
+	#define DISPATCH(NAME,MAXSIZE) \
+		CMPQ CX, $MAXSIZE;         \
+		JA   3(PC);                \
+		MOVQ $NAME(SB), AX;        \
+		JMP  AX
+
+	TEXT ·reflectcall(SB), NOSPLIT, $0-32
+		MOVLQZX argsize+24(FP), CX
+		// NOTE(rsc): No call16, because CALLFN needs four words
+		// of argument space to invoke callwritebarrier.
+		DISPATCH(runtime·call32, 32)
+		DISPATCH(runtime·call64, 64)
+		...
+
+# -----------------------------------------------------------------------------
+* Go内部实现
+# -----------------------------------------------------------------------------
+
+* Go关键字(01) - f(1, 2, 3)
+
+调用 f(1, 2, 3) 一般对应以下汇编语句(32位系统):
+
+	MOVL $1, 0(SP)
+	MOVL $2, 4(SP)
+	MOVL $3, 8(SP)
+	CALL f(SB)
+
+* Go关键字(02) - go f(1, 2, 3)
+
+Go关键字调用 f(1, 2, 3) 则对应以下汇编语句(32位系统):
+
+	MOVL  $1, 0(SP)
+	MOVL  $2, 4(SP)
+	MOVL  $3, 8(SP)
+	PUSHQ $f(SB)
+	PUSHQ $12
+	CALL  runtime.newproc(SB)
+	POPQ  AX
+	POPQ  AX
+
+- 先将 f 的参数放入栈位置
+- 将 f 本身入栈
+- 将 f 参数的大小入栈(3个参数, 12个字节)
+- 调用 runtime.newproc 辅助函数启动 Goroutine
+
+* Defer关键字(01) - 开始
+
+defer 语句的处理和 go 语句类似:
+
+	MOVL  $1, 0(SP)
+	MOVL  $2, 4(SP)
+	MOVL  $3, 8(SP)
+	PUSHQ $f(SB)
+	PUSHQ $12
+	CALL  runtime.deferproc(SB)
+
+- 调用 runtime.deferproc 将对应函数记录到 defer 函数栈中
+- 在当前函数返回时才真正执行
+
+* Defer关键字(02) - 返回时执行
+
+正常的函数返回:
+
+	ADDL $48, SP // 48对应的是帧大小
+	RET
+
+含有 defer 语句的函数返回:
+
+	CALL runtime.deferreturn(SB)
+	ADDL $48, SP
+	RET
+
+- 由 runtime.deferreturn 从依次执行 defer 函数栈中的函数
+
+
+* Defer关键字(03) - defer 结构
+
+	struct Defer {
+		int32 siz;
+		byte* sp;
+		byte* fn;
+		Defer* link;
+		byte args[8]; // padded to actual size
+	};
+
+* Defer关键字(04) - deferreturn 实现
+	void deferreturn(uintptr arg0) {
+		byte *sp, *fn;
+		Defer *d;
+
+		sp = (byte*)&arg0;
+		d = g->defer;
+		if(d == nil || d->sp != sp)
+			return;
+		mcpy(d->sp, d->args, d->siz);
+		g->defer = d->link;
+		fn = d->fn;
+		free(d);
+		jmpdefer(fn, sp);
+	}
+
+# CGO函数调用
+
+
+# -----------------------------------------------------------------------------
+* 你好, 世界!
+# -----------------------------------------------------------------------------
+
+* 你好, 世界! - Go语言
+
+.code chai2010-golang-asm-intro/hello-v1/main.go /package main/,
+
+* 你好, 世界! - AMD64汇编
+
+.code chai2010-golang-asm-intro/hello-v1-asm/main_amd64.s /#include/,
+
+Go汇编语言走向世界!
+
+# -----------------------------------------------------------------------------
+* 参考资源
+# -----------------------------------------------------------------------------
+
+* MOVE数据传输指令
+
+.image chai2010-golang-asm-intro/images/move-instructions.png
+
+* 汇编代码参考
+
+- [[https://golang.org/src/crypto/][crypto/*/*.s]]
+- [[https://golang.org/src/math/][math/*.s]]
+- [[https://golang.org/src/runtime/][runtime/*.s]]
+- [[https://golang.org/src/runtime/cgo][runtime/cgo/*.s]]
+- [[https://golang.org/src/sync/atomic/][sync/atomic/*.s]]
+- [[https://golang.org/src/syscall/][syscall/*.s]]
+- [[https://github.com/golang/sys][golang.org/x/sys/windows/*.s]]
+- [[https://github.com/golang/snappy][github.com/golang/snappy/*.s]]
+
+* 参考文档
+
+- [[https://golang.org/doc/asm][https://golang.org/doc/asm]]
+- [[https://golang.org/pkg/cmd/internal/obj/x86/][https://golang.org/pkg/cmd/internal/obj/x86/]]
+- [[https://9p.io/sys/doc/asm.html][https://9p.io/sys/doc/asm.html]]
+
+# -----------------------------------------------------------------------------
+# END
+# -----------------------------------------------------------------------------
