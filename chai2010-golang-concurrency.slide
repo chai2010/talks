@@ -22,7 +22,7 @@ https://github.com/chai2010
 - Github: [[https://github.com/chai2010][https://github.com/chai2010]]
 - QQ群: 102319854
 
-.image chai2010-golang-asm-intro/images/frontpage.png
+.image chai2010-golang-concurrency/frontpage.png
 
 
 # -----------------------------------------------------------------------------
@@ -126,15 +126,160 @@ https://github.com/chai2010
 - sync.WaitGroup 用于等待一组并发体完成
 
 # -----------------------------------------------------------------------------
-# 并发的内存模型
+* 并发的内存模型
 # -----------------------------------------------------------------------------
+
+* 原子操作
+
+- 最小的且不可并行化 的操作
+- 保证共享资源的完整性, 避免出现完成一半的状态
+- sync/atomic 对数值类型/指针 等提供原子读写支持
+- sync.Mutex 也可以封装自己的原子操作
+
+* 顺序一致性内存模型
+
+	var msg string
+	var done bool = false
+
+	func main() {
+		msg = "hello, world"
+		done = true
+	}
+
+- msg 和 done 哪个先完成赋值要看具体场景!
+- msg 和 done 是否能够完成赋值也要看具体场景!
+- msg 和 done 赋值的顺序和代码书写的顺序并不等价!
+
+* 同一个Goroutine内: 满足顺序一致性内存模型
+
+	var msg string
+	var done bool = false
+
+	func main() {
+		msg = "hello, world"
+		done = true
+
+		for {
+			if done {
+				println(msg)
+				break
+			}
+		}
+	}
+
+- 先设置 msg 字符串, 然后设置 done 标志
+- 那么, 如果 done 标志为 true, msg 必然已经完成初始化
+- 如果 msg 完成了初始化, 那么打印并退出程序
+- 单线程是 OK
+
+* 不同Goroutine之间: 不满足顺序一致性!
+
+	var msg string
+	var done bool = false
+
+	func main() {
+		go func() {
+			msg = "hello, world"
+			done = true
+		}()
+
+		for {
+			if done {
+				println(msg)
+				break
+			}
+		}
+	}
+
+- main线程可能无法看到后台线程对msg和done做的更新
+- msg 的修改不是原子操作, main可能看到被修改一半的数据
+- 多线程环境, 程序结果未知
+
+* 通过Channel设置时间参考
+
+	var msg string
+	var done = make(chan bool)
+
+	func main() {
+		go func() {
+			msg = "hello, world"
+			done <- true
+		}()
+
+		<-done
+		println(msg)
+	}
+
+- done管道的发送和接收会强制进行一次同步
+- 此刻, 后台线程内, 满足顺序一致性内存模型, 字符串完成初始化
+- 此刻, main线程通过同步, 分享到后台线程此刻的字符串状态
+- 然后, main打印出了初始化之后的字符串
+
+* 通过sync.Mutex设置时间参考
+
+	var msg string
+	var done sync.Mutex
+
+	func main() {
+		done.Lock()
+		go func() {
+			msg = "hello, world"
+			done.Unlock()
+		}()
+
+		done.Lock()
+		println(msg)
+	}
+
+- sync.Mutex也是设置时间参考
+- 但是, 代码可读性没有管道好
+
+* 带缓存的管道可控制并发数
+
+	var limit = make(chan int, 3)
+
+	func main() {
+		for _, w := range work {
+			go func() {
+				limit <- 1
+				w()
+				<-limit
+			}()
+		}
+		select{}
+	}
+
+- 并发程序不仅仅是要运行的更快
+- 关键是要并发层度可控!
+- 散步时就要慢一点...
+
+* 初始化顺序
+
+.image chai2010-golang-concurrency/init.png
+
+- 进入 main 函数之前, 只有一个Goroutine运行
+- 进入 main 函数之后, 在 init 中启动的 Goroutine 可能会被执行
+
+
+* Goroutine特点
+
+- 由go关键字启动, 是一种轻量级的线程
+- 以一个很小的栈启动(可能是2KB/4KB), 可以启动很多
+- Goroutine栈的大小会根据需要动态地伸缩, 不用担心栈溢出
+- m个goroutine运行在n个操作系统线程上, n默认对应CPU核数
+- runtime.GOMAXPROCS用于控制当前运行运行正常非阻塞Goroutine的系统线程数目
+- 发生在用户态, 切换的代价要比系统线程低(切换时只需要保存必要的寄存器)
+- Goroutine采用的是半抢占式的协作调度(在函数入口处插入协作代码)
+- IO/sleep/runtime.Gosched 均会导致调度
 
 
 # -----------------------------------------------------------------------------
-# 常见的并发模式
+* 常见的并发模式
 # -----------------------------------------------------------------------------
 
 # Once 代码分析
+
+# 素数筛
 
 # -----------------------------------------------------------------------------
 # END
