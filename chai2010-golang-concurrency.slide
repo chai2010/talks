@@ -178,6 +178,8 @@ https://github.com/chai2010
 	var done bool = false
 
 	func main() {
+		runtime.GOMAXPROCS(1)
+
 		go func() {
 			msg = "hello, world"
 			done = true
@@ -201,6 +203,8 @@ https://github.com/chai2010
 	var done = make(chan bool)
 
 	func main() {
+		runtime.GOMAXPROCS(1)
+
 		go func() {
 			msg = "hello, world"
 			done <- true
