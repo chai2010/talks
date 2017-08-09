@@ -68,9 +68,9 @@ Note: 讲稿注释
 ---
 
 - Node.JS 是一个命令行 JS 引擎
-- Electron 则是一个支持 GUI 对 JS 引擎
-- Electron 在 Node.JS 的基础上增加了对 Chrome 对支持
-- Electron 是 Node.JS 对超集
+- Electron 则是一个支持 GUI 的 JS 引擎
+- Electron 在 Node.JS 的基础上增加了对 Chrome 的支持
+- Electron 是 Node.JS 的超集
 
 ---
 
@@ -97,7 +97,7 @@ console.log('你好, 世界')
 
 ---
 
-- NodeJS: `node examples/hello-v1.js`
+- Node.JS: `node examples/hello-v1.js`
 - Electron: `electron examples/hello-v1.js`
 
 ---
