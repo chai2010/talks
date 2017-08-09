@@ -74,6 +74,11 @@ Note: 讲稿注释
 
 ---
 
+- Electron 将 Node.JS 的标准库带入了 Chrome 中
+- Electron 将 Node.JS 的模块化编程带入了 Chrome 中
+
+---
+
 - 网站: https://github.com/electron/electron
 - 安装: `npm install electron -g`
 
@@ -84,7 +89,7 @@ Note: 讲稿注释
 
 ---
 
-hello.js:
+examples/hello-v1.js:
 
 ```js
 console.log('你好, 世界')
@@ -92,8 +97,8 @@ console.log('你好, 世界')
 
 ---
 
-- NodeJS: `node hello.js`
-- Electron: `electron hello.js`
+- NodeJS: `node examples/hello-v1.js`
+- Electron: `electron examples/hello-v1.js`
 
 ---
 
@@ -107,7 +112,7 @@ console.log('你好, 世界')
 
 ---
 
-hello.js:
+examples/hello-v2.js:
 
 ```js
 console.log('你好, 世界')
@@ -116,13 +121,90 @@ process.exit(0)
 
 ---
 
+- process 是 NodeJS 内置的表示当前进程对象
 - 调用 `process.exit(0)` 主动退出
-- Node.JS 和 Electron 对行为终于一致
+- Node.JS 和 Electron 行为一致
 
 ---
 
 - Node.JS 和 Electron 其实是类似的工具
 - Electron 只是标准库比 Node.JS 多一些包而已
+
+
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  -->
+***
+
+## 你好, 世界 - V3
+
+---
+
+examples/hello-v3/index.js:
+
+```js
+const electron = require('electron')
+
+electron.app.on('ready', () => {
+	let win = new electron.BrowserWindow()
+	win.loadURL(`file:///${__dirname}/index.html`)
+})
+```
+---
+
+examples/hello-v3/index.html:
+
+```html
+<h1>你好, 世界</h1>
+```
+
+---
+
+- Electron 运行: `electron examples/hello-v3`
+
+===
+
+## 效果图
+---
+
+TODO
+
+===
+
+## 改进: 避免 win 被提前回收
+
+---
+
+```js
+const electron = require('electron')
+
+let win = null
+
+electron.app.on('ready', () => {
+	if(win == null) {
+		win = new electron.BrowserWindow()
+		win.loadURL(`file:///${__dirname}/index.html`)
+	}
+})
+```
+
+---
+
+- `win` 改为模块级变量
+
+
+===
+
+## 打开调试窗口
+
+---
+
+```js
+win.webContents.openDevTools()
+```
+
+---
+
+截图
+
 
 <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  -->
 ***
