@@ -76,6 +76,7 @@ _____________
 
 - 网站: https://github.com/electron/electron
 - 安装: `npm install electron -g`
+- 镜像: https://npm.taobao.org
 
 <!-- ======================================================================  -->
 ****
@@ -94,8 +95,8 @@ _____________
 - Electron: `electron examples/hello-v1.js`
 _____________
 
-- Node.JS 执行完成后退出了
-- Electron 执行完成后没有退出
+- Node.JS 执行完成后退出了(命令行程序默认方式)
+- Electron 执行完成后没有退出(GUI程序默认方式)
 
 <!-- ======================================================================  -->
 ****
@@ -111,9 +112,9 @@ process.exit(0)
 ```
 _____________
 
-- process 是 NodeJS 内置的表示当前进程对象
-- 调用 `process.exit(0)` 主动退出
-- Node.JS 和 Electron 行为一致
+- process 是 NodeJS 内置的表示当前进程的对象
+- 打印完成后调用 `process.exit(0)` 主动退出
+- Node.JS 和 Electron 运行效果一致
 _____________
 
 - Node.JS 和 Electron 其实是类似的工具
@@ -150,10 +151,39 @@ _____________
 <!-- ----------------------------------------------------------------------  -->
 ----
 
-## 效果图
+## 读懂代码
 _____________
 
-TODO
+```js
+// 用 Node.JS 提供的 require 函数加载 electron 包
+// 加载的 electron 包对象赋值给名为 electron 常量
+const electron = require('electron')
+
+// electron.app 通过 electron 常量引用 electron 包中的 app 对象
+// app 对象有一个 on 方法, 用于注册各种消息处理函数
+// ready 消息在 app 对象准备就绪之后由 electron 框架发出
+// 然后触发我们转入的消息处理函数...
+electron.app.on('ready', () => {
+	// 创建一个浏览器窗口, 保持到 win 局部变量中
+	let win = new electron.BrowserWindow()
+
+	// 这个新创建的浏览器窗口加载当前目录下的 index.html 页面
+	// 其中 __dirname 是 Node.JS 引入的特性, 表示当前js源文件所在目录
+	win.loadURL(`file:///${__dirname}/index.html`)
+})
+```
+_____________
+
+- 提示: 代码藏有BUG...
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## 运行预览
+_____________
+
+![](./images/hello-v3-01.png) <!-- .element: style="width:100%; height:500px;" -->
 
 <!-- ----------------------------------------------------------------------  -->
 ----
