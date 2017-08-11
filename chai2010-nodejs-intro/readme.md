@@ -332,11 +332,100 @@ _____________
 <!-- ======================================================================  -->
 ****
 
-## 网页中操作本地文件
+## 网页程序的限制
 _____________
 
 - 通用的浏览器为了安全, 禁止JS直接操作本地文件
 - Electron 集成了 Node.JS 标准库, 没有限制
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## 网页中导入 fs 模块
+_____________
+
+examples/hello-v4/index.html
+
+```html
+<h1>你好, 世界</h1>
+<script>
+const fs = require('fs')
+
+let now = new Date()
+fs.writeFileSync(`${__dirname}/_time.txt`, now.toString())
+</script>
+```
+_____________
+
+- require 依然有效
+- Electron 集成了 Node.JS 的标准库
+- 导入 fs 模块操作文件
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## 网页中启动其它进程 - 01
+_____________
+
+examples/hello-v5/index.html
+
+```html
+<script>
+const child_process = require('child_process')
+
+let n = 100
+let data = child_process.execSync(`node ${__dirname}/sum.js ${n}`)
+console.log(`sum(1+2+...${n}):`, data.toString())
+</script>
+```
+_____________
+
+- 导入 child_process 模块, execSync 同步执行进程
+- 启动进程的命令: `node ${__dirname}/sum.js ${n}`
+- 进程的命令行参数和标准输出
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## 网页中启动其它进程 - 02
+_____________
+
+examples/hello-v5/sum.js
+
+```js
+function sum(n) {
+	let s = 0
+	for(let i = 0; i <= n; i++) {
+		s += i
+	}
+	return s
+}
+if(require.main === module) {
+	let args = process.argv.splice(2)
+	if(args.length > 0) {
+		console.log(sum(args[0]|0))
+	}
+}
+```
+_____________
+
+- `require.main === module` 主模块/导入模块
+- `process.argv`: [node, sum.js, 其它命令行参数...]
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## JS的并发限制
+_____________
+
+- JS 是单线程的语言, 通过异步模式处理多种事物
+- 或者child_process启动多进程, 然后跨进程通讯
+- 如果想多线程的能力, 可手写C/C++模块
+
 
 <!-- ======================================================================  -->
 ****
