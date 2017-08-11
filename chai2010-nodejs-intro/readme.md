@@ -430,6 +430,130 @@ _____________
 <!-- ======================================================================  -->
 ****
 
+## Photon: 美化 Electron 应用
+_____________
+
+![](./images/photon-v1-01.png) <!-- .element: style="width:100%; height:400px;" -->
+_____________
+
+http://photonkit.com
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## Photon: 布局模板
+_____________
+
+examples/photon-v1/index.html
+
+```html
+<div class="window">
+    <header class="toolbar toolbar-header">
+		页眉部分
+	</header>
+
+	<div class="window-content">
+		内容部分
+	</div>
+
+	<footer class="toolbar toolbar-footer">
+		页脚部分
+	</footer>
+</div>
+```
+_____________
+
+http://photonkit.com/getting-started/
+
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## Photon: Electron/jQuery 包 - 01
+_____________
+
+examples/photon-v1/index.html
+
+```html
+<script>
+// 导入 Electron 模块
+const electron = require('electron')
+
+// Electron 包含了 Node.JS 模块特性
+// jQuery 会自动转为 require 模块使用方式
+const $ = require('./jquery-3.2.1.min.js')
+
+// 界面加载完成
+$(document).ready(() => {
+    $('.window-content').text(`electron: ${process.versions.electron}`)
+})
+</script>
+```
+_____________
+
+- 页面引入的 electron 包 和主进程是不同的包
+- jquery 最好以 require 方式加载
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## Photon: Electron/jQuery 包 - 02
+_____________
+
+examples/photon-v1/index.html
+
+```html
+<script>
+// 退出按钮
+$('#btn-cancel').click(() => {
+    alert('退出')
+
+    // 向主进程发送退出消息
+    electron.ipcRenderer.send('myapp', 'quit', 123, 'abc')
+})
+
+// 保存按钮
+$('#btn-save').click(() => {
+    alert('保存')
+})
+</script>
+```
+_____________
+
+- 页面最好避免直接退出程序, 向主进程发送消息
+- `electron.ipcRenderer` 进程间的通讯管道
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## Photon: Electron/jQuery 包 - 03
+_____________
+
+examples/photon-v1/index.js
+
+```js
+// 主进程监控退出消息
+electron.ipcMain.on('myapp', (event, ...args) => {
+    console.log('args:', ...args)
+
+    if(args.length > 0 && args[0] == 'quit') {
+        electron.app.quit()
+    }
+})
+```
+_____________
+
+- `electron.ipcMain` 是管道在主进程的名字
+- myapp 是自定义的消息名称
+- 消息可以带参数
+
+
+<!-- ======================================================================  -->
+****
+
 ## 模块化编程
 _____________
 
