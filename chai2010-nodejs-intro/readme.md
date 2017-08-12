@@ -768,7 +768,7 @@ _____________
 <!-- ======================================================================  -->
 ****
 
-## Vue.js
+## Vue.js & Electron
 _____________
 
 examples/hello-vue/index.html
@@ -798,16 +798,16 @@ _____________
 <!-- ======================================================================  -->
 ****
 
-## Angular & TypeScript & Electron
+## Angular & Electron
 _____________
 
 ![](./examples/hello-ng2/ng2-electron.png) <!-- .element: style="width:100%; height:300px;" -->
 
 _____________
 
-- http://www.typescriptlang.org
 - https://angular.io
 - https://angular.cn
+- http://www.typescriptlang.org
 
 <!-- ----------------------------------------------------------------------  -->
 ----
