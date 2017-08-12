@@ -771,12 +771,16 @@ _____________
 ## Vue.js
 _____________
 
+examples/vue-app/index.html
+
 ```html
 <div id="app">
 	{{ message }}
 </div>
 
 <script>
+const Vue = require('./vue.min.js')
+
 let app = new Vue({
 	el: '#app',
 	data: {
@@ -787,7 +791,8 @@ let app = new Vue({
 ```
 _____________
 
-https://vuejs.org/
+- `electron examples/vue-app`
+- https://vuejs.org/
 
 
 <!-- ======================================================================  -->
