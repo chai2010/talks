@@ -798,8 +798,58 @@ _____________
 <!-- ======================================================================  -->
 ****
 
-## Angular & TypeScript - 01
+## Angular & TypeScript & Electron
 _____________
+
+![](./examples/hello-ng2/ng2-electron.png) <!-- .element: style="width:100%; height:300px;" -->
+
+_____________
+
+- http://www.typescriptlang.org
+- https://angular.io
+- https://angular.cn
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## 你好, Angular - 预览
+_____________
+
+![](./examples/hello-ng2/demo.png) <!-- .element: style="width:100%; height:500px;" -->
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## 你好, Angular - 目录结构
+_____________
+
+examples/hello-ng2/
+
+```
+pkg-06/
+├─ demo.html
+├─ demo.ts
+├─ index.ts
+├─ tsconfig.ts
+└─ package.json
+```
+_____________
+
+- demo.html: 启动页面
+- demo.ts: ng2 全部代码, TypeScript 语言
+- index.ts: Electron 启动代码, TypeScript 语言
+- tsconfig.ts: TypeScript 编译配置文件
+- package.json: Node.JS 配置文件
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## 你好, Angular - 导入包
+_____________
+
+examples/hello-ng2/demo.ts
 
 ```ts
 import * as ngCore                   from '@angular/core'
@@ -808,16 +858,16 @@ import * as ngPlatformBrowserDynamic from '@angular/platform-browser-dynamic'
 ```
 _____________
 
-- http://www.typescriptlang.org
-- https://angular.io
-- https://angular.cn
+- Angular的模块全部在 `@angular` 名字空间下
 
 
 <!-- ----------------------------------------------------------------------  -->
 ----
 
-## Angular & TypeScript - 02
+## 你好, Angular - 窗口组件
 _____________
+
+examples/hello-ng2/demo.ts
 
 ```ts
 @ngCore.Component({
@@ -845,8 +895,10 @@ _____________
 <!-- ----------------------------------------------------------------------  -->
 ----
 
-## Angular & TypeScript - 03
+## 你好, Angular - Angular 模块
 _____________
+
+examples/hello-ng2/demo.ts
 
 ```ts
 @ngCore.NgModule({
@@ -866,8 +918,10 @@ _____________
 <!-- ----------------------------------------------------------------------  -->
 ----
 
-## Angular & TypeScript - 04
+## 你好, Angular - 启动
 _____________
+
+examples/hello-ng2/demo.ts
 
 ```ts
 export function main() {
@@ -877,6 +931,32 @@ export function main() {
 _____________
 
 - 启动 Angular 模块
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## 你好, Angular - html页面
+_____________
+
+examples/hello-ng2/demo.html
+
+```html
+<!DOCTYPE html>
+
+<head>
+	<title>Angular2应用</title>
+</head>
+
+<body>
+	<my-app>加载UI组件</my-app>
+	<script>require('./demo').main()</script>
+</body>
+```
+_____________
+
+- `<my-app></my-app>` 对应 Angular 窗口组件
+- `require('./demo').main()` 启动 Angular 程序
 
 
 <!-- ======================================================================  -->
