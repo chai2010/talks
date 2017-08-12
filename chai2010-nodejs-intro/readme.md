@@ -557,7 +557,212 @@ _____________
 ## 模块化编程
 _____________
 
-TODO
+- 将一行行代码打包为函数以便维护和重复使用
+- 将函数打包到一个个js文件作为模块
+- 将一个个js文件组织到目录作为模块包
+- ...
+_____________
+
+- 一个 js 文件对应一个模块
+- 一个 目录 会对应一个 js 文件, 其实也一个模块
+- node_modules 是放置模块的标准目录
+_____________
+
+- 模块化是分而治之的策略
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## 没有模块化前的写法
+_____________
+
+examples/pkg-01/index.js
+
+```js
+function sayHello() {
+	console.log('你好, 世界')
+}
+
+sayHello()
+```
+_____________
+
+- `node examples/pkg-01/index.js`
+- `node examples/pkg-01`
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## 模块化的写法
+_____________
+
+examples/pkg-02/hello.js
+
+```js
+function sayHello() {
+	console.log('你好, 世界')
+}
+
+exports.sayHello = sayHello
+```
+_____________
+
+examples/pkg-02/index.js
+
+```js
+const helloPkg = require('./hello.js')
+
+helloPkg.sayHello()
+```
+_____________
+
+- require 将模块的 exports 对象返回
+- helloPkg 是 hello.js 中 exports 对象的引用
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## 目录作为一个模块
+_____________
+
+examples/pkg-04/hello/index.js // hello.js -> hello/index.js
+
+```js
+function sayHello() {
+	console.log('你好, 世界')
+}
+
+exports.sayHello = sayHello
+```
+_____________
+
+examples/pkg-04/index.js
+
+```js
+const helloPkg = require('./hello') // require 时去掉 .js 后缀名
+
+helloPkg.sayHello()
+```
+_____________
+
+- 导入目录时, 默认是导入目录下的 index.js 模块
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## 目录模块的配置 - package.json
+_____________
+
+examples/pkg-04/hello/hello.js // index.js -> hello.js
+
+```js
+function sayHello() {
+	console.log('你好, 世界')
+}
+
+exports.sayHello = sayHello
+```
+_____________
+
+examples/pkg-04/hello/package.json
+
+```json
+{
+	"main": "hello.js"
+}
+```
+_____________
+
+- 目录下 package.json 的 main 字段指定对应的 js 文件
+- 缺省情况下是 index.js 文件
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## 聚合多个模块导出 - 01
+_____________
+
+examples/pkg-05/hello/hi.js
+
+```js
+function hi() {
+	console.log('hi')
+}
+
+exports.hi = hi
+```
+_____________
+
+- 增加一个 hi 子模块
+- 希望导入目录时, 同时导出 hello.js 和 hi.js 模块
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## 聚合多子个模块导出 - 02
+_____________
+
+examples/pkg-05/hello/index.js
+
+```js
+const helloPkg = require('./hello')
+const hiPkg = require('./hi')
+
+exports.sayHello = helloPkg.sayHello
+exports.hi = hiPkg.hi
+```
+_____________
+
+- 在目录入口将子模块的导出符号重新导出
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## node_modules 目录
+_____________
+
+examples/pkg-06
+
+```
+pkg-06/
+├─ node_modules/
+│   └── hello/
+│       ├── hello.js
+│       ├── hi.js
+│       └── index.js
+└── index.js
+```
+_____________
+
+examples/pkg-06/index.js
+
+```js
+const helloPkg = require('hello') // 标准路径
+...
+```
+_____________
+
+- 将 hello 目录移到 node_modules/hello
+- 相对导入路径变为标准导入路径
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## npm 和 node_modules
+_____________
+
+- npm 是 Node.JS 官方的包管理工具
+- npm 的官方网址为 https://www.npmjs.com
+- 国内镜像 https://npm.taobao.org
+_____________
+
+- node_modules 并不依赖 npm
 
 
 <!-- ======================================================================  -->
