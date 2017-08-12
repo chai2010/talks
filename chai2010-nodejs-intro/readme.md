@@ -768,10 +768,110 @@ _____________
 <!-- ======================================================================  -->
 ****
 
-## html内联JS和模块化
+## Vue.js
 _____________
 
-TODO
+```html
+<div id="app">
+	{{ message }}
+</div>
+
+<script>
+let app = new Vue({
+	el: '#app',
+	data: {
+		message: 'Hello Vue!'
+	}
+})
+</script>
+```
+_____________
+
+https://vuejs.org/
+
+
+<!-- ======================================================================  -->
+****
+
+## Angular & TypeScript - 01
+_____________
+
+```ts
+import * as ngCore                   from '@angular/core'
+import * as ngPlatformBrowser        from '@angular/platform-browser'
+import * as ngPlatformBrowserDynamic from '@angular/platform-browser-dynamic'
+```
+_____________
+
+- http://www.typescriptlang.org
+- https://angular.io
+- https://angular.cn
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## Angular & TypeScript - 02
+_____________
+
+```ts
+@ngCore.Component({
+	selector: 'my-app',
+	template: `
+		<h1>你好, {{name}}! - V1</h1>
+	`,
+	styles: [
+		`h1 {
+			color: #369;
+			font-family: Arial, Helvetica, sans-serif;
+			font-size: 250%;
+		}`,
+	],
+})
+export class MainComponent {
+	name = '世界'
+}
+```
+_____________
+
+- 创建窗口组件
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## Angular & TypeScript - 03
+_____________
+
+```ts
+@ngCore.NgModule({
+	imports: [ ngPlatformBrowser.BrowserModule ],
+	declarations: [ MainComponent ],
+	bootstrap: [ MainComponent ],
+})
+export class MainModule {
+	//
+}
+```
+_____________
+
+- 将窗口组件打包为 Angular 模块
+
+
+<!-- ----------------------------------------------------------------------  -->
+----
+
+## Angular & TypeScript - 04
+_____________
+
+```ts
+export function main() {
+	ngPlatformBrowserDynamic.platformBrowserDynamic().bootstrapModule(MainModule)
+}
+```
+_____________
+
+- 启动 Angular 模块
 
 
 <!-- ======================================================================  -->
