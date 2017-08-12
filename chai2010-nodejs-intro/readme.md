@@ -771,7 +771,7 @@ _____________
 ## Vue.js
 _____________
 
-examples/vue-app/index.html
+examples/hello-vue/index.html
 
 ```html
 <div id="app">
@@ -791,7 +791,7 @@ let app = new Vue({
 ```
 _____________
 
-- `electron examples/vue-app`
+- `electron examples/hello-vue`
 - https://vuejs.org/
 
 
