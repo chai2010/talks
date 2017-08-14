@@ -42,7 +42,7 @@ Reveal.js 可能会需要 AJAX 异步加载 Markdown 文件, 可以在当前目�
 	</a>
 </h4>
 
->Note: Atom 原子; Electron 电子; Photo 光子;
+>Note: Atom 原子; Electron 电子; Photon 光子;
 
 <!-- ======================================================================  -->
 ****
