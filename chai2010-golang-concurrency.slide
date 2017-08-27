@@ -24,6 +24,49 @@ https://github.com/chai2010
 
 .image chai2010-golang-concurrency/frontpage.png
 
+# -----------------------------------------------------------------------------
+* 演化历史
+# -----------------------------------------------------------------------------
+
+* 语言演化历史
+
+.image chai2010-golang-concurrency/go-history.png
+
+- [[http://en.wikipedia.org/wiki/B_(programming_language)][B]] - Ken Thompson, 1969
+- [[http://en.wikipedia.org/wiki/C_(programming_language)][C]] - Dennis Ritchie, 1972
+- [[http://en.wikipedia.org/wiki/Newsqueak][Newsqueak]] - Rob Pike, 1989, GUI
+- [[http://en.wikipedia.org/wiki/Alef_(programming_language)][Alef]] - Phil Winterbottom, 1993, *C-like*
+- [[http://en.wikipedia.org/wiki/Limbo_(programming_language)][Limbo]] - Sean Dorward, Phil Winterbottom, Rob Pike,1995
+- [[http://golang.org/][Go]] - 2009, *C-like*
+
+* 并发的相关特性
+
+- [[http://coolshell.cn/articles/1351.html][管道]] - Malcolm Douglas McIlroy, 1964
+- [[http://en.wikipedia.org/wiki/Communicating_sequential_processes][CSP]] - C. A. R. Hoare, 1978
+
+相关历史:
+
+- [[https://swtch.com/~rsc/thread/][Bell Labs and CSP Threads]] - Russ Cox
+
+* Newsqueak素数筛(01) - Rob Pike, 1989
+
+.code chai2010-golang-concurrency/squint.newsqueak /^counter/,/^}/
+
+.code chai2010-golang-concurrency/squint.newsqueak /^filter/,/^}/
+
+.image chai2010-golang-concurrency/spaceglenda37.png 250 1000
+
+* Newsqueak素数筛(02) - Rob Pike, 1989
+
+.code chai2010-golang-concurrency/squint.newsqueak /sieve OMIT/,
+
+* Alef(01) - Phil Winterbottom, 1993
+
+.code chai2010-golang-concurrency/helloworld.alef
+
+* Alef(02) - Phil Winterbottom, 1993
+
+.image chai2010-golang-concurrency/alef.png
 
 # -----------------------------------------------------------------------------
 * 你好, 并发!
@@ -297,7 +340,7 @@ https://github.com/chai2010
 
 .code -edit chai2010-golang-concurrency/prime_sieve.go /^func PrimeFilter/,/^}/
 
-* 素数筛(04) - 菊花链
+* 素数筛(04) - 管道级联
 
 .play -edit chai2010-golang-concurrency/prime_sieve.go /^func main/,/^}/
 
