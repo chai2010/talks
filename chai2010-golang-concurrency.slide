@@ -138,28 +138,29 @@ https://github.com/chai2010
 - main 函数永远不会退出(没问题)
 
 
-* 见了鬼了: main函数居然占着茅坑(CPU)不拉屎(干活)!
+* 存在问题: main函数居然独占了系统线程!
 
 .play chai2010-golang-concurrency/hello-v5.go /func main/,
 
-- `for {}` 死循环保证了main函数不会退出, 但是依然占用了 CPU 资源
-- 当只有一个系统线程资源时, main 将独占CPU, 其它线程被饿死
+- `for {}` 死循环保证了main函数不会退出, 但是依然占用了 系统线程
+- 当只有一个系统线程资源时, main 将独占活跃的 系统线程, 其它线程被饿死
+- 活跃的 系统线程 是有限的资源
 
-* 让不拉屎(干活)的main函数先站在茅坑(CPU)边上等着!
+* 避免让不干活的main函数独占了系统线程
 
 .play chai2010-golang-concurrency/hello-v6.go /func main/,
 
-- `select {}` 保证了main函数不会退出, 不占用了 CPU 资源
+- `select {}` 保证了main函数不会退出, 不再独占 系统线程 资源
 - 即使只有一个系统线程资源时, 后台线程依然有机会执行
 
 * 虐待main函数的方法当然不止一种...
 
 .play chai2010-golang-concurrency/hello-v7.go /func main/,
 
-- `<-make(chan int)` 保证了main函数不会退出, 不占用了 CPU 资源
+- `<-make(chan int)` 保证了main函数不会退出, 不再独占 系统线程 资源
 - 即使只有一个系统线程资源时, 后台线程依然有机会执行
 
-* 崩溃: 居然都不拉屎(干活)了 - 阻塞导致死锁异常
+* 崩溃: 居然都不干活了 - 阻塞导致死锁异常
 
 .play chai2010-golang-concurrency/hello-v8.go /func main/,
 
