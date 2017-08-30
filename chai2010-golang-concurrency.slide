@@ -57,6 +57,9 @@ https://github.com/chai2010
 
 .code chai2010-golang-concurrency/squint.newsqueak /sieve OMIT/,
 
+- begin 启动一个并发, 类似 go 关键字
+- become 返回值, 类似 return 关键字
+
 * Newsqueak素数筛(03) - 原理
 
 .image chai2010-golang-concurrency/prime-sieve.png 500 1000
@@ -65,33 +68,48 @@ https://github.com/chai2010
 
 .code chai2010-golang-concurrency/helloworld.alef
 
+- proc 启动一个进程
+- task 启动一个线程
+
 * Alef(02) - Phil Winterbottom, 1993
 
 .image chai2010-golang-concurrency/alef.png
+
+同时支持进程和线程, 伪装成编程语言的操作系统?
+
 
 # -----------------------------------------------------------------------------
 * 你好, 并发!
 # -----------------------------------------------------------------------------
 
-* 并发很简单
+* 并发很简单(Go的并发好强大)
 
 .play chai2010-golang-concurrency/hello.go /package main/,
 
 - go关键字启动一个Goroutine
 - 请分析程序的运行状态
 
-* 解决并发中的小问题
+* 解决并发中的小问题(01)
 
 .play chai2010-golang-concurrency/hello-v2.go /package main/,
 
 - 请分析程序的运行状态
 - time.Sleep 的作用?
 
-* WTF! Go语言的并发真的是弱爆了!
+
+* 解决并发中的小问题(02)
+
+.play chai2010-golang-concurrency/hello-v2-bug.go /package main/,
+
+- 很不幸, println 内部足足睡眠了 2 秒钟 !
+
+* WTF: Go语言并发真的是弱爆了(小问题并不容易解决)!
 
 .play chai2010-golang-concurrency/hello-v3.go /func main/,
 
-- 请分析程序的运行状态
+- 更不幸的情况, 直接霸道地不返回了
+- 即使 time.Sleep 一万年也没辙
+
 
 * 并发小问题分析
 
@@ -151,9 +169,9 @@ https://github.com/chai2010
 
 .play chai2010-golang-concurrency/hello-v9.go /func main/,
 
-- main 函数阻塞
-- 直到 done 管道有数据
-- 当 done 管道有数据时, 后台 Goroutine 必然已经完成工作
+- main 函数阻塞, 直到 done 管道有数据
+- 当 done 管道有数据时, 后台 Goroutine 必然已经完成了打印工作
+- Goroutine 何时退出并不关心, 重点是工作已经完成了
 - 完美的并发!
 
 * 充分利用并发资源
