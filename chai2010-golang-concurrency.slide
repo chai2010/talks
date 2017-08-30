@@ -14,11 +14,8 @@ https://github.com/chai2010
 
 * 自我介绍(chai2010)
 
-- [[https://golang.org/CONTRIBUTORS][Go语言代码贡献者]]
-- [[https://github.com/golang-china/gopl-zh][Go语言圣经]]翻译者
-- [[https://github.com/golang-china][Go语言中文文档]]翻译者
-- [[https://groups.google.com/forum/#!forum/golang-china][golang-china]] 邮件列表初始创建者和维护者
-- [[https://code.google.com/p/go/source/browse/misc/notepadplus/README][notepad++]]等功能的完善和实现([[https://code.google.com/p/go/source/browse/misc/notepadplus/userDefineLang.xml][语法高亮]]/[[https://code.google.com/p/go/source/browse/misc/notepadplus/go.xml][内建函数自动补全]]/[[https://code.google.com/p/go/source/browse/misc/notepadplus/functionList.xml][函数列表]]等)
+- Go语言圣经 [[https://github.com/golang-china/gopl-zh][翻译者]]
+- Go语言代码 [[https://golang.org/CONTRIBUTORS][贡献者]]
 - Github: [[https://github.com/chai2010][https://github.com/chai2010]]
 - QQ群: 102319854
 
@@ -39,7 +36,7 @@ https://github.com/chai2010
 - [[http://en.wikipedia.org/wiki/Limbo_(programming_language)][Limbo]] - Sean Dorward, Phil Winterbottom, Rob Pike,1995
 - [[http://golang.org/][Go]] - 2009, *C-like*
 
-* 并发的相关特性
+* 理论基础
 
 - [[http://coolshell.cn/articles/1351.html][管道]] - Malcolm Douglas McIlroy, 1964
 - [[http://en.wikipedia.org/wiki/Communicating_sequential_processes][CSP]] - C. A. R. Hoare, 1978
@@ -464,16 +461,20 @@ https://github.com/chai2010
 
 - ctx 有超时限制, 并且可主动退出
 
+* sync.Map (Go1.9)
+
+.play chai2010-golang-concurrency/sync-map.go /func main/,
+
+	func (m *Map) Load(key interface{}) (value interface{}, ok bool)
+	func (m *Map) LoadOrStore(key, value interface{}) (actual interface{}, loaded bool)
+
+
 * 海量请求的处理思路
 
 - 海量请求先存入一个带较大缓冲的管道中, 缓冲大小可能是数千或数万
-- 构建后台线程池, 各自从带缓存的管道取任务执行
+- 构建后台 Goroutine 池, 各自从同一个带缓存的管道取任务执行
 
 
 # -----------------------------------------------------------------------------
 # END
 # -----------------------------------------------------------------------------
-
-
-
-
