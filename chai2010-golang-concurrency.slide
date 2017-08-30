@@ -2,6 +2,12 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+# 安装 Go语言扩展包的 present 工具
+# https://godoc.org/golang.org/x/tools/present
+
+# 命令行切换到当前目录, 运行 present 命令
+# 浏览器打开 http://127.0.0.1:3999
+
 # -----------------------------------------------------------------------------
 
 Go语言并发编程
