@@ -11,9 +11,11 @@
 # -----------------------------------------------------------------------------
 
 Go语言并发编程
+Tags: go, golang, concurrency
 
-chai2010
+柴树杉(chaishushan{AT}gmail.com)
 chaishushan@gmail.com
+shushanchai@yunify.com
 https://github.com/chai2010
 
 # -----------------------------------------------------------------------------
@@ -81,7 +83,7 @@ https://github.com/chai2010
 
 .image chai2010-golang-concurrency/alef.png
 
-同时支持进程和线程, 伪装成编程语言的操作系统?
+Alef 同时支持进程和线程, 是伪装成编程语言的操作系统!
 
 
 # -----------------------------------------------------------------------------
