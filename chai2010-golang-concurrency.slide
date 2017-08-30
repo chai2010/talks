@@ -57,6 +57,10 @@ https://github.com/chai2010
 
 .code chai2010-golang-concurrency/squint.newsqueak /sieve OMIT/,
 
+* Newsqueak素数筛(03) - 原理
+
+.image chai2010-golang-concurrency/prime-sieve.png 500 1000
+
 * Alef(01) - Phil Winterbottom, 1993
 
 .code chai2010-golang-concurrency/helloworld.alef
@@ -110,14 +114,14 @@ https://github.com/chai2010
 - main 函数永远不会退出(没问题)
 
 
-* 见了鬼了: main函数居然占着茅坑不拉屎!
+* 见了鬼了: main函数居然占着茅坑(CPU)不拉屎(干活)!
 
 .play chai2010-golang-concurrency/hello-v5.go /func main/,
 
 - `for {}` 死循环保证了main函数不会退出, 但是依然占用了 CPU 资源
 - 当只有一个系统线程资源时, main 将独占CPU, 其它线程被饿死
 
-* 让不拉屎的main函数先站在茅坑边上等着!
+* 让不拉屎(干活)的main函数先站在茅坑(CPU)边上等着!
 
 .play chai2010-golang-concurrency/hello-v6.go /func main/,
 
@@ -131,12 +135,13 @@ https://github.com/chai2010
 - `<-make(chan int)` 保证了main函数不会退出, 不占用了 CPU 资源
 - 即使只有一个系统线程资源时, 后台线程依然有机会执行
 
-* 崩溃: 居然都不拉屎了 - 阻塞导致死锁异常
+* 崩溃: 居然都不拉屎(干活)了 - 阻塞导致死锁异常
 
 .play chai2010-golang-concurrency/hello-v8.go /func main/,
 
 - main 因为阻塞导致永远不会退出
 - 没有其它可运行的goroutine导致异常
+- 操作系统中如果没有任何一个进程在运行会是什么样子?
 
 注意:
 
@@ -157,7 +162,7 @@ https://github.com/chai2010
 
 - 充分利用了系统的并发资源
 - 输出顺序有一定的随机性
-- main退出时工作全部完成
+- main退出时全部 *打印工作* 完成, 但 *无法保证Goroutine全部退出*
 
 * 充分利用sync标准库
 
@@ -176,6 +181,8 @@ https://github.com/chai2010
 - sync/atomic 对数值类型/指针 等提供原子读写支持
 - sync.Mutex 也可以封装自己的原子操作
 
+*只有原子操作并不能保证写出正确的并发程序！*
+
 * 顺序一致性内存模型
 
 	var msg string
@@ -189,6 +196,9 @@ https://github.com/chai2010
 - msg 和 done 哪个先完成赋值要看具体场景!
 - msg 和 done 是否能够完成赋值也要看具体场景!
 - msg 和 done 赋值的顺序和代码书写的顺序并不等价!
+
+*原子操作配合一致性内存模型就可以写出正确的并发程序！*
+
 
 * 同一个Goroutine内: 满足顺序一致性内存模型
 
@@ -237,7 +247,7 @@ https://github.com/chai2010
 - msg 的修改不是原子操作, main可能看到被修改一半的数据
 - 多线程环境, 程序结果未知
 
-* 通过Channel设置时间参考
+* 通过Channel对齐时间参考系
 
 	var msg string
 	var done = make(chan bool)
@@ -259,7 +269,7 @@ https://github.com/chai2010
 - 此刻, main线程通过同步, 分享到后台线程此刻的字符串状态
 - 然后, main打印出了初始化之后的字符串
 
-* 通过sync.Mutex设置时间参考
+* 通过sync.Mutex对齐时间参考系
 
 	var msg string
 	var done sync.Mutex
@@ -276,6 +286,7 @@ https://github.com/chai2010
 	}
 
 - sync.Mutex也是设置时间参考
+- done.Unlock() 和第二个 done.Lock() 会做一次同步
 - 但是, 代码可读性没有管道好
 
 * 带缓存的管道可控制并发数
@@ -295,7 +306,7 @@ https://github.com/chai2010
 
 - 并发程序不仅仅是要运行的更快
 - 关键是要并发层度可控!
-- 散步时就要慢一点...
+- 散步时就是要慢一点...
 
 * 初始化顺序
 
@@ -315,6 +326,9 @@ https://github.com/chai2010
 - 发生在用户态, 切换的代价要比系统线程低(切换时只需要保存必要的寄存器)
 - Goroutine采用的是半抢占式的协作调度(在函数入口处插入协作代码)
 - IO/sleep/runtime.Gosched 均会导致调度
+- Goroutine故意设计为没有ID
+
+*注意：Goroutine是一种资源，也有泄露的风险！*
 
 
 # -----------------------------------------------------------------------------
