@@ -9,7 +9,7 @@ func main() {
 	var wg sync.WaitGroup // HL
 
 	for i := 0; i < N; i++ {
-		wg.Add(1) // HL
+		wg.Add(1) // 必须在 go 语句前调用! // HL
 		go func(i int) {
 			defer wg.Done() // HL
 			println(i, "你好, 并发!")

@@ -148,12 +148,12 @@ Alef 同时支持进程和线程, 是伪装成编程语言的操作系统!
 
 并发的几个原则:
 
-- go启动goroutine时无法保证新线程马上运行
+- go启动Goroutine时无法保证新线程马上运行
 - main退出时程序退出
 
 解决的思路:
 
-- 后台gotoutine完成之前main函数不能退出.
+- 后台Goroutine完成之前main函数不能退出.
 
 * 暴力一点: 不要让main函数退出!
 
@@ -234,6 +234,15 @@ Alef 同时支持进程和线程, 是伪装成编程语言的操作系统!
 .play chai2010-golang-concurrency/hello-v11.go /func main/,
 
 - sync.WaitGroup 用于等待一组并发体完成
+
+* 小心闭包陷阱
+
+.play chai2010-golang-concurrency/hello-v12.go /func main/,
+
+.play chai2010-golang-concurrency/hello-v12-02.go /func main/,
+
+.play chai2010-golang-concurrency/hello-v12-03.go /func main/,
+
 
 # -----------------------------------------------------------------------------
 * 并发的内存模型
