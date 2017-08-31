@@ -201,6 +201,14 @@ Alef 同时支持进程和线程, 是伪装成编程语言的操作系统!
 
 - `for {}` 死循环并不会导致死锁异常
 
+
+* 有人干活, 有人偷懒
+
+.play chai2010-golang-concurrency/hello-v8-02.go /func main/,
+
+- 不干活和浪费资源都不可取
+- 要劳逸结合
+
 * 要做好Goroutine的善后工作
 
 .play chai2010-golang-concurrency/hello-v9.go /func main/,
@@ -547,6 +555,7 @@ Alef 同时支持进程和线程, 是伪装成编程语言的操作系统!
 - 避免 main 提前退出导致其它 Goroutine 被全部杀死
 - Goroutine 执行长时间的运算不要永远霸占系统线程(协作式调度)
 - Goroutine 要保证在 *最快* 和 *最慢* 两个极端场景都是正常的
+- Goroutine 不要运行 *太快*, 也不要 *太慢*
 - 忘记多线程, 忘记锁, 使用管道来同步
 - 小心 Goroutine 泄露
 
