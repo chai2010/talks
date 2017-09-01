@@ -14,7 +14,7 @@ func main() {
         go func(id int) {
             defer wg.Done()
 
-            limit <- struct{}{} // Goroutine 数量小于 len(limit) 才能进入 // HL
+            limit <- struct{}{} // len(limit) 小于 cap(limit) 才能进入 // HL
             defer func(){ <-limit }() // 退出时 len(limit) 减 1 // HL
 
             println(id)
