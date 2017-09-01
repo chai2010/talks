@@ -113,14 +113,45 @@ Alef 同时支持进程和线程, 是伪装成编程语言的操作系统!
 * 你好, 并发!
 # -----------------------------------------------------------------------------
 
-* 并发很简单(Go的并发好强大)
+* 并发很简单
+
+	// 普通版本
+	func main() {
+		println("你好, 并发!")
+	}
+
+	// 并发版本
+	func main() {
+		go println("你好, 并发!")
+	}
+
+- go 关键字调用函数
+
+
+* Go的并发好强大
+
+	func main() {
+		for {
+			go stackoverflow()
+		}
+	}
+
+	func stackoverflow() {
+		stackoverflow()
+	}
+
+- 每个 Goroutine *栈很小*, 切换代价很低, 可以海量并发
+- 每个 Goroutine *栈很大*, 没有逻辑限制, 可以无限递归
+- 横向和纵向都可以无限扩展(只受资源限制)
+
+* 并发中的小问题(01): 没事走两步~
 
 .play chai2010-golang-concurrency/hello.go /package main/,
 
 - go关键字启动一个Goroutine
 - 请分析程序的运行状态
 
-* 解决并发中的小问题(01)
+* 并发中的小问题(02)
 
 .play chai2010-golang-concurrency/hello-v2.go /package main/,
 
@@ -128,7 +159,7 @@ Alef 同时支持进程和线程, 是伪装成编程语言的操作系统!
 - time.Sleep 的作用?
 
 
-* 解决并发中的小问题(02)
+* 解决并发中的小问题(03)
 
 .play chai2010-golang-concurrency/hello-v2-bug.go /package main/,
 
