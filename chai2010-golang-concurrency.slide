@@ -391,21 +391,7 @@ Alef 同时支持进程和线程, 是伪装成编程语言的操作系统!
 
 * 赢者为王
 
-	func main() {
-		ch := make(chan string, 32)
-
-		go func() {
-			ch <- searchByBing("golang")
-		}
-		go func() {
-			ch <- searchByGoogle("golang")
-		}
-		go func() {
-			ch <- searchByBaidu("golang")
-		}
-
-		fmt.Println(<-ch)
-	}
+.play -edit chai2010-golang-concurrency/fast-search.go /^func main/,/^}/
 
 - 启动多个冗余的Goroutine, 返回第一个结果
 - 虽然可能会有一定的CPU浪费, 但是以最快速度返回结果
