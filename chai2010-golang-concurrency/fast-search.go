@@ -2,30 +2,53 @@
 
 package main
 
+import (
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+)
+
 func main() {
-    ch := make(chan string, 32)
+	for i := 0; i < 10; i++ {
+		ch := make(chan string, 32) // HL
 
-    go func() {
-        ch <- searchByBing("golang")
-    }()
-    go func() {
-        ch <- searchByGoogle("golang")
-    }()
-    go func() {
-        ch <- searchByBaidu("golang")
-    }()
+		go func() {
+			if _, err := searchByBaidu("golang"); err == nil {
+				ch <- "baidu" // HL
+			}
+		}()
+		go func() {
+			if _, err := searchByBing("golang"); err == nil {
+				ch <- "bing" // HL
+			}
+		}()
 
-    fmt.Println(<-ch)
+		fmt.Println(<-ch) // HL
+	}
 }
 
-func searchByBing(key string) string {
-	return ""
+func searchBySoso(key string) (string, error) {
+	return httpGet(fmt.Sprintf("http://www.sogou.com/web?query=%s", url.QueryEscape(key)))
 }
 
-func searchByGoogle(key string) string {
-	return ""
+func searchByBing(key string) (string, error) {
+	return httpGet(fmt.Sprintf("http://www.bing.com/search?q=%s", url.QueryEscape(key)))
 }
 
-func searchByBaidu(key string) string {
-	return ""
+func searchByBaidu(key string) (string, error) {
+	return httpGet(fmt.Sprintf("http://www.baidu.com/s?wd=%s", url.QueryEscape(key)))
+}
+
+func httpGet(url string) (string, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(body), nil
 }
