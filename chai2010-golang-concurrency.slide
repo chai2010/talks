@@ -290,13 +290,7 @@ Alef 同时支持进程和线程, 是伪装成编程语言的操作系统!
 
 * 顺序一致性内存模型
 
-	var msg string
-	var done bool = false
-
-	func main() {
-		msg = "hello, world"
-		done = true
-	}
+.code chai2010-golang-concurrency/mem-model-v1.go /package main/,
 
 - msg 和 done 哪个先完成赋值要看具体场景!
 - msg 和 done 是否能够完成赋值也要看具体场景!
@@ -307,20 +301,7 @@ Alef 同时支持进程和线程, 是伪装成编程语言的操作系统!
 
 * 同一个Goroutine内: 满足顺序一致性内存模型
 
-	var msg string
-	var done bool = false
-
-	func main() {
-		msg = "hello, world"
-		done = true
-
-		for {
-			if done {
-				println(msg)
-				break
-			}
-		}
-	}
+.play chai2010-golang-concurrency/mem-model-v2.go /var msg/,
 
 - 先设置 msg 字符串, 然后设置 done 标志
 - 那么, 如果 done 标志为 true, msg 必然已经完成初始化
@@ -329,24 +310,7 @@ Alef 同时支持进程和线程, 是伪装成编程语言的操作系统!
 
 * 不同Goroutine之间: 不满足顺序一致性!
 
-	var msg string
-	var done bool = false
-
-	func main() {
-		runtime.GOMAXPROCS(1)
-
-		go func() {
-			msg = "hello, world"
-			done = true
-		}()
-
-		for {
-			if done {
-				println(msg)
-				break
-			}
-		}
-	}
+.play chai2010-golang-concurrency/mem-model-v3.go /var msg/,
 
 - main线程可能无法看到后台线程对msg和done做的更新
 - msg 的修改不是原子操作, main可能看到被修改一半的数据
@@ -354,20 +318,7 @@ Alef 同时支持进程和线程, 是伪装成编程语言的操作系统!
 
 * 通过Channel对齐时间参考系
 
-	var msg string
-	var done = make(chan bool)
-
-	func main() {
-		runtime.GOMAXPROCS(1)
-
-		go func() {
-			msg = "hello, world"
-			done <- true
-		}()
-
-		<-done
-		println(msg)
-	}
+.play chai2010-golang-concurrency/mem-model-v4.go /var msg/,
 
 - done管道的发送和接收会强制进行一次同步
 - 此刻, 后台线程内, 满足顺序一致性内存模型, 字符串完成初始化
@@ -376,42 +327,19 @@ Alef 同时支持进程和线程, 是伪装成编程语言的操作系统!
 
 * 通过sync.Mutex对齐时间参考系
 
-	var msg string
-	var done sync.Mutex
+.play chai2010-golang-concurrency/mem-model-v5.go /var msg/,
 
-	func main() {
-		done.Lock()
-		go func() {
-			msg = "hello, world"
-			done.Unlock()
-		}()
-
-		done.Lock()
-		println(msg)
-	}
-
-- sync.Mutex也是设置时间参考
+- sync.Mutex也是设置时间参考(必须先 Lock, 再 Unlock)
 - done.Unlock() 和第二个 done.Lock() 会做一次同步
 - 但是, 代码可读性没有管道好
 
 * 带缓存的管道可控制并发数
 
-	var limit = make(chan int, 3)
-
-	func main() {
-		for _, w := range work {
-			go func() {
-				limit <- 1
-				w()
-				<-limit
-			}()
-		}
-		select{}
-	}
+.play chai2010-golang-concurrency/mem-model-v6.go /func main/,
 
 - 并发程序不仅仅是要运行的更快
 - 关键是要并发层度可控!
-- 散步时就是要慢一点...
+- 散步时不要跑的太快...
 
 * 初始化顺序
 
