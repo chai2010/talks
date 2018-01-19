@@ -4,28 +4,40 @@
 
 # -----------------------------------------------------------------------------
 
-Go语言CGO简介
+深入CGO编程
+深入Go语言系列
+Tags: gopherchina, 2018, cgo
 
 chai2010
+青云, 应用平台开发部, 研发工程师
 chaishushan@gmail.com
 https://github.com/chai2010
+
 
 # -----------------------------------------------------------------------------
 
 * 自我介绍(chai2010)
 
 - [[https://golang.org/CONTRIBUTORS][Go语言代码贡献者]]
-- [[https://github.com/golang-china/gopl-zh][Go语言圣经]]翻译者
-- [[https://github.com/golang-china][Go语言中文文档]]翻译者
-- [[https://groups.google.com/forum/#!forum/golang-china][golang-china]] 邮件列表初始创建者和维护者
-- [[https://github.com/chai2010/notepadplus-go][notepad++]] Go语言支持插件(高亮/函数列表/支持Go汇编)
+- [[https://github.com/golang-china/gopl-zh][《Go语言圣经》]]翻译者
+- [[https://github.com/chai2010/advanced-go-programming-book][《Go语言高级编程》]]作者
+- [[https://github.com/openpitrix/openpitrix][openpitrix]] 开源多云管理平台
 
-- chaishushan{AT}gmail.com
 - Github: [[https://github.com/chai2010][https://github.com/chai2010]]
 - QQ群: 102319854
 
+# 图片换为2个图书截图
+
 .image chai2010-golang-cgo-intro/images/frontpage.png
 
+# -----------------------------------------------------------------------------
+* CGO技术的定位
+# -----------------------------------------------------------------------------
+
+- CGO 是一个保底的后备技术
+- 如果Go能搞定, 请不要使用 CGO
+- 如果Go不能搞定, 但是C/C++能搞定, 请考虑CGO
+- go mobile 基于CGO技术实现
 
 # -----------------------------------------------------------------------------
 * 你好, 世界!
