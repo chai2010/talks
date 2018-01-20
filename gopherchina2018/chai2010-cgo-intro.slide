@@ -45,32 +45,11 @@ https://github.com/chai2010
 
 * 你好, 世界!(01)
 
-	package main
-
-	//#include <stdio.h>
-	import "C"
-
-	func main() {
-		C.puts(C.CString("Hello, World\n"))
-	}
+.code hello-v1/main.go /^package/,
 
 * 你好, 世界!(02)
 
-	
-	package main
-
-	/*
-	#include <stdio.h>
-
-	static void SayHello(char* s) {
-		printf(s);
-	}
-	*/
-	import "C"
-
-	func main() {
-		C.SayHello(C.CString("Hello, World\n"))
-	}
+.code hello-v2/main.go /^package/,
 
 
 * 你好, 世界!(03)
