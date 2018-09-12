@@ -5,6 +5,7 @@
 1. Go语言简介
 1. Go语言并发编程
 1. [深入CGO编程](https://github.com/chai2010/gopherchina2018-cgo-talk)
+1. Go汇编语言简介
 1. 2018 - Go语言将走向何方?
 1. Protobuf-RPC简介
 
