@@ -51,12 +51,40 @@ https://github.com/chai2010
 .image chai2010-golang-concurrency/weixin-qrcode.png 400 800
 
 
-* 并发编程分享的历史
+# -----------------------------------------------------------------------------
+* 开胃小吃
+# -----------------------------------------------------------------------------
 
-- 2015 - 武汉 皓月科技(祝波)
-- 2017 - 青云北京，内部分享
-- 2018.09.16 - 武汉猫友会，光谷软件园
-- ?
+* Go入门到精通
+
+- Go指南: [[https://tour.golang.org][https://tour.golang.org]], [[https://tour.go-zh.org/][https://tour.go-zh.org/]]
+- Go圣经: [[https://gopl.io][https://gopl.io]], [[https://github.com/golang-china/gopl-zh][https://github.com/golang-china/gopl-zh]]
+- Go进阶: [[https://github.com/chai2010/advanced-go-programming-book][https://github.com/chai2010/advanced-go-programming-book]]
+
+* 2018 - Go语言将走向何方?
+
+- Go1.11实验性支持模块化, Go1.12转正
+- Go1.11实验性支持WebAssembly, 这是一个新平台的新启点
+- Go2官方草案: 范型和错误处理
+
+GIAC 全球互联网架构大会 - 中国·上海（2018/11/23-24）
+
+[[http://2018.thegiac.com/][http://2018.thegiac.com/]]
+
+* 当年用小霸王打天下，现在用的是WebAssembly
+
+.image chai2010-golang-concurrency/go-wasm-nes.png 500 700
+
+* WebAssembly标准入门
+
+.image chai2010-golang-concurrency/wasm-book.png 540 700
+
+# * 并发编程分享的历史
+# 
+# - 2015 - 武汉 皓月科技(祝波)
+# - 2017 - 青云北京，内部分享
+# - 2018.09.16 - 武汉猫友会，光谷软件园
+# - ?
 
 # -----------------------------------------------------------------------------
 * Go语言并发哲学
