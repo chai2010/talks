@@ -52,7 +52,7 @@ https://github.com/chai2010
 
 
 # -----------------------------------------------------------------------------
-* 开胃小吃
+* Go相关信息
 # -----------------------------------------------------------------------------
 
 * Go入门到精通
@@ -73,11 +73,13 @@ GIAC 全球互联网架构大会 - 中国·上海（2018/11/23-24）
 
 [[http://2018.thegiac.com/][http://2018.thegiac.com/]]
 
-* 当年用小霸王打天下，现在用的是WebAssembly
+* WebAssembly - Ending定律
+
+所有可以用WebAssembly实现的终将会用WebAssembly实现。
 
 .image chai2010-golang-concurrency/go-wasm-nes.png 500 700
 
-* WebAssembly标准入门
+* 全球第一本WASM专著 - 柴树杉(chai2010) & 丁尔男(Ending定律)
 
 .image chai2010-golang-concurrency/wasm-book.png 540 700
 
@@ -565,6 +567,9 @@ Alef 同时支持进程和线程, 是伪装成编程语言的操作系统!
 - 忘记多线程, 忘记锁, 使用管道来同步
 - 小心 Goroutine 泄露
 
+* _
+
+.image chai2010-golang-concurrency/weixin-qrcode.png 400 800
 
 # -----------------------------------------------------------------------------
 # END
