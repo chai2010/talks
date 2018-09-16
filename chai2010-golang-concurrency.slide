@@ -195,22 +195,22 @@ Alef 同时支持进程和线程, 是伪装成编程语言的操作系统!
 - 每个 Goroutine *栈很大*, 没有逻辑限制, 可以无限递归
 - 横向和纵向都可以无限扩展(只受资源限制)
 
-* 并发中的小问题(01): 没事走两步~
+* 并发中的小问题: 没事走两步~
 
 .play chai2010-golang-concurrency/hello.go /package main/,
 
 - go关键字启动一个Goroutine
 - 请分析程序的运行状态
 
-* 并发中的小问题(02)
+* Go并非浪得虚名 - time.Sleep 的救赎
 
-.play chai2010-golang-concurrency/hello-v2.go /package main/,
+.play chai2010-golang-concurrency/hello-v2.go /package main/,/^}/
 
 - 请分析程序的运行状态
 - time.Sleep 的作用?
 
 
-* 解决并发中的小问题(03)
+* 撞大运编程模式
 
 .play chai2010-golang-concurrency/hello-v2-bug.go /package main/,
 
